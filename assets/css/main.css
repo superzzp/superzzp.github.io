@@ -128,7 +128,10 @@ em, i {
   font-style: italic; }
 
 p {
-  margin: 0 0 2em 0; }
+  margin: 0 0 2em 0; 
+  font-size: 1.25em;
+  color: #3d4449;
+}
 
 h1, h2, h3, h4, h5, h6 {
   color: #3d4449;
@@ -1261,6 +1264,8 @@ a.image {
 ol {
   list-style: decimal;
   margin: 0 0 2em 0;
+  color:  #3d4449;
+  font-size: 1.25em;
   padding-left: 1.25em; }
   ol li {
     padding-left: 0.25em; }
@@ -1268,6 +1273,8 @@ ol {
 ul {
   list-style: disc;
   margin: 0 0 2em 0;
+  color: #3d4449;
+  font-size: 1.25em;
   padding-left: 1em; }
   ul li {
     padding-left: 0.5em; }
@@ -2144,10 +2151,10 @@ button,
       -webkit-object-fit: cover;
       -ms-object-fit: cover;
       object-fit: cover;
-      -moz-object-position: center;
-      -webkit-object-position: center;
-      -ms-object-position: center;
-      object-position: center;
+      -moz-object-position: bottom;
+      -webkit-object-position: bottom;
+      -ms-object-position: bottom;
+      object-position: bottom;
       width: 100%; }
   @media screen and (orientation: portrait) {
     #banner {
