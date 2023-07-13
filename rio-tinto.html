@@ -119,7 +119,61 @@
 									
 									<hr class="major" />
 									<h2>Evaluation & Analysis of the Models</h2>
+									<h3>DistilBert</h3>
+									<p>For the evaluation of classification models, specifically the DistilBERT model using a two-step classification approach, we utilized a dataset comprising 33,000 data points generated for the training model.</p>
+									<p>To address the class imbalance issue, downsampling was applied to ensure a more balanced distribution of the labels. By reducing the instances of the majority classes, we aimed to improve the model’s ability to learn and generalize across all classes.</p>
+									<p>We trained the above model on distill bert on num_epochs = 20, batch_size = 32, and used a test set of 130 human labeled dates for evaluation of dates. Below are results produced from 130 sample dataset:</p>
+									<p>Survey type labels predictions on 130 examples human test set: Accuracy: 71.54%</p>
+									<span class="image main"><img src="images/rio-tinto/DistilBert-surveytype.png" alt="" /></span>
+									<p>Survey temporal status labels predictions: Accuracy: 86.15%</p>
+									<span class="image main"><img src="images/rio-tinto/DistilBert-surveytemporalstatus.png" alt="" /></span>
+									<p>After removing the “not labeled” data, the total number of data points decreased to 65. Consequently, the accuracy improved significantly. However, the f1-score for the “planned” category decreased to 0.33.</p>
+									
+									<h3>FASText</h3>
+									<p>We also used a text classification approach using the FastText algorithm. FastText, developed by Facebook’s AI Research (FAIR), is a powerful library that offers efficient solutions for text classification and representation learning. By representing words as character n-grams, FastText captures valuable word-level and subword-level information. Our goal was to leverage FastText for classification on labeled text data.</p>
+									<p>The performance achieved for the survey type classification on 130 test set is as follows:</p>
+									<span class="image main"><img src="images/rio-tinto/FASText-surveytype.png" alt="" /></span>
+									<p>The performance achieved for the temporal status classification is as follows:</p>
+									<span class="image main"><img src="images/rio-tinto/FASText-surveytemporalstatus.png" alt="" /></span>
+									
+									<h3>DistilRoBERTa</h3>
+									<p>We also tried the DistilRoBERTa model for two step classification tasks. For survey type classification, we directly fed the first two paragraphs of press release as input to train the model, while for temporal classification, we fed the first two paragraphs of press release and the survey type as two inputs for the model to classify into Ended, In-progress and Planned. The classification report for the results is shown below:</p>
+									<p>The performance achieved for the survey type classification is as follows:</p>
+									<span class="image main"><img src="images/rio-tinto/DistilRoBERTa-surveytype.png" alt="" /></span>
+									<p>The performance achieved for the temporal status classification is as follows:</p>
+									<span class="image main"><img src="images/rio-tinto/DistilRoBERTa-surveytemporalstatus.png" alt="" /></span>
+									
+									<p>In our exploration of classification approaches, we noted BERT-based methods such as BERTopic and DistilBERT to be remarkably effective, especially for 'label' classification tasks. FastText too performed well, thanks to its use of word embeddings.</p>
+									<p>However, not all results hit the mark. The zero-shot Contriever and DistilBERT enhanced with bidirectional LSTM and pooling, failed to deliver expected improvements. This underperformance signals potential difficulties in defining thresholds and issues with linear relevance scoring.</p>
+									<p>A key insight from our analysis was DistilBERT's contrasting performance - exceptional accuracy for 'label' classification, but a downturn for 'temporal_label' classification. This discrepancy underscores the need to refine our training data and labeling process.</p>
+									<p>Our system, notably, leans towards generating more false positives than false negatives - a concern as it may cause misclassifications and inaccuracies, impacting the system's overall reliability.</p>
+									<p>While we haven't analyzed results from time-stamped data or long-term trends, it’s noteworthy that despite our survey-type classification falling short of DistilBERT, it outperforms the latter in temporal status. This improvement could be due to the additional contextual information provided to the model, like the type of survey.</p>
+									
+									<h3>Question-Answering Date Extractive model (Flan-T5)</h3>
+									<p>We recently evaluated our dates extraction model using a test set of 130 human-labeled data points, and the date extractive model achieve an overall accuracy of 50.54%. </p>
+									<p>Although our date extraction model fell short of GPT's performance — with GPT achieving 73% accuracy for the geophysics survey and 67% for the geochemistry survey — it's crucial to dive deeper into the figures to gain a comprehensive understanding.</p>
+									<p>The finer points behind the results are:</p>
+									<ol>
+										<li>Standardization: When the model encounters incomplete date information, it defaults to the current date for the missing data. For example, an input of '2013' is predicted as '2013-06-14', assuming the current date is June 14. This standardization leads to an apparent mismatch in accuracy calculations, although, in essence, the year is correctly predicted.</li>
+										<li>Formats: The model stumbles when it comes to unconventional date formats like 'Mid-July', which it can't readily standardize to a specific date. In these cases, the output is marked as N/A, leading to an apparent mismatch despite the actual dates overlapping.</li>
+										<li>Concluded Surveys: When a survey concludes, it may not always make sense to have separate start and end dates. For instance, if a survey ends on December 6, the model predicts the start date as December 6 while marking the end date as N/A. While this result gives us the necessary information, it technically counts as a mismatch due to the data being in different columns.</li>
+									</ol>
+									<p>These nuances highlight the need for an in-depth understanding of accuracy calculations beyond the raw percentage figures. Despite the lower accuracy, our model still provides valuable date information — you just need to know where to look!</p>
 
+									<hr class="major" />
+									<h2>Future work</h2>
+									<p>There are also some additional work we can do in the future to further improve our project:</p>
+									<h3>Expanding test set to make the distribution of each class more balanced</h3>
+									<p>We used a manually labeled 130 examples test set to verify the accuracies of the classification and date labels produced by GPT, and choose the prompts that produced the highest accuracies as the prompt we used to generate the training labels. However, the manual labeling procedure is only performed after we select 10 samples from each class combination from a historical dataset, based on the results of an initial labeling using a baseline GPT prompt. Since the baseline prompts are written before the start of prompt engineering, they not produce the results as accurately as our best prompts. As a result, some stratified samples do not actually belong to the class combinations that they were initially labeled, resulting in an unbalanced 130 examples test set, especially for the completion status labels — the majority of the labels in the 130 test set actually belongs to “Ended or Result-released”, and there are fewer examples in the “Planned” and “In-progress”. Therefore, in the future the 130 test set can be expanded to have balanced representations of examples in each class.</p>
+									<h3>Further improve the performance of the date extraction models</h3>
+									<p>While we achieve a relatively high accuracy on both of the classification models, we could work on improving the accuracy of our dates extraction model. We should accommodate more date formats so the system doesn’t ignore a lot of valid predictions.</p>
+									<p>Another suggestion to improve our accuracy is to also take into account the temporal classification when training the models to make inference. For example, when the temporal status for a particular survey is “Planned” or “Ended or Result Released”, then it wouldn’t make sense to predict the separate start or end date for the survey, since a survey could be planned or ended only in a single moment in time. Therefore, in the future we could consider training separate date extraction models for different types of the press releases.</p>
+
+									<hr class="major" />
+									<h2>Conclusion</h2>
+									<p>And there you have it! From scraping mining-related press releases to training machine learning models and to dealing with challenges of label-less data — it’s been quite a journey! As we dig deeper into this project, we’re continually refining our models, learning more about the nuances of the mining industry, and improving our strategies for data balance and accuracy.</p>
+									<p>We’re extremely grateful to have had this opportunity to work with Rio Tinto and create something meaningful and valuable for the mining industry. It’s been an enlightening journey and we’re eager to continue this work, pushing the boundaries of what machine learning can achieve.</p>
+									<p>Thank you for following along with us on this adventure. Remember, the exciting world of data science is a journey, not a destination, and there are always new frontiers to explore. We can’t wait to share more of our findings and experiences with you. Stay tuned and until then, keep discovering!</p>
 								</section>
 
 						</div>
