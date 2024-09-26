@@ -5,200 +5,381 @@
 	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
 -->
 <html>
-	<head>
-		<title>Blog - Alex (Zhipian) Zhang</title>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-		<link rel="stylesheet" href="assets/css/main.css" />
-	</head>
-	<body class="is-preload">
 
-		<!-- Wrapper -->
-			<div id="wrapper">
+<head>
+	<title>Blog - Alex (Zhipian) Zhang</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<link rel="stylesheet" href="assets/css/main.css" />
+</head>
 
-				<!-- Main -->
-					<div id="main">
-						<div class="inner">
+<body class="is-preload">
 
-							<!-- Header -->
-								<header id="header">
-									<a href="rio-tinto.html" class="logo"><strong>Blog Post</strong> by Alex (Zhipian) Zhang</a>
-									<ul class="icons">
-										<li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
-										<li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
-										<li><a href="#" class="icon brands fa-snapchat-ghost"><span class="label">Snapchat</span></a></li>
-										<li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
-										<li><a href="#" class="icon brands fa-medium-m"><span class="label">Medium</span></a></li>
-									</ul>
-								</header>
+	<!-- Wrapper -->
+	<div id="wrapper">
 
-							<!-- Content -->
-								<section>
-									<header class="main">
-										<h1>Rio Tinto Mining Survey Scrapper Project — UBC Master of Data Science Team</h1>
-									</header>
+		<!-- Main -->
+		<div id="main">
+			<div class="inner">
 
-									<span class="image main"><img src="images/rio-tinto/coverpage.jpg" alt="" /></span>
+				<!-- Header -->
+				<header id="header">
+					<a href="rio-tinto.html" class="logo"><strong>Blog Post</strong> by Alex (Zhipian) Zhang</a>
+					<ul class="icons">
+						<li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
+						<li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
+						<li><a href="#" class="icon brands fa-snapchat-ghost"><span class="label">Snapchat</span></a>
+						</li>
+						<li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
+						<li><a href="#" class="icon brands fa-medium-m"><span class="label">Medium</span></a></li>
+					</ul>
+				</header>
 
-									<p>Hey there! Welcome to our behind-the-scenes look at the creation of a unique AI project that’s helping Rio Tinto keep their finger on the pulse of the mining industry.</p>
-									<p>Imagine this — a system that can wade through the vast ocean of the internet, combing through countless press releases from thousands of resource companies, and finding out the completion status of mining-related geophysics and geochemistry surveys. Sounds like science fiction? Well, it’s the technology for the future that we are developing today. Its aim? To collect all the critical intelligence about planned, in-progress, or recently completed mining-related surveys to help Rio Tinto make savvy investment decisions. Cool, right?</p>
-									<p>The heart of the project is its well-defined focus, a product of numerous chats, debates, and brainstorming sessions with our partners. When we kicked off, we had around 20 overlapping mining-related events to pick from — everything from operational details to financial decisions and personnel changes. With so many possibilities, we did our homework and got familiar with the ins and outs of the mining industry, tracing the mineral exploration roadmap from initial prospecting and surveys all the way to discovery and continuous monitoring.</p>
-									<p>But the jackpot question was — what event should we prioritize for tracking from a business perspective? After a lot of discussions, we and our partners concluded that the most valuable information to follow would be mining-related geophysics or geochemistry surveys, their completion status, and the survey's begin and end dates.</p>
+				<!-- Content -->
+				<section>
+					<header class="main">
+						<h1>Rio Tinto Mining Survey Scrapper Project — UBC Master of Data Science Team</h1>
+					</header>
 
-									<span class="image main"><img src="images/rio-tinto/survey-types.png" alt="" /></span>
+					<span class="image main"><img src="images/rio-tinto/coverpage.jpg" alt="" /></span>
 
-									<p>Now, onto the big hurdle: the data we received. Rio Tinto had given us an impressive dataset of around 33,000 press releases, but there was a catch — none of the info about survey type, temporal status, or date was labeled. Yes, you heard it right, a goldmine of information but not a label in sight.</p>
-									<p>We took a swing at several unsupervised learning approaches, like topic modeling using Latent Dirichlet Allocation (LDA), and information retrieval using Facebook’s pretrained Contriver model for zero-shot classification. But the results? Well, let’s just say they left something to be desired.</p>
-									<p>After a solid chat with our academic advisor, Professor Zhu, we realized that a supervised approach could be a game-changer for our performance levels. But how can you supervise without labels? That’s where GPT, one of the most popular large language models, comes in.</p>
-									<p>We designed a workflow that passed the historical dataset through GPT to annotate the data. We started off with a basic prompt to annotate 5000 press releases and used stratified sampling to choose a 130-example test set. We then manually annotated each example and treated them as our ground-truth. By carefully tweaking our prompts and selecting the one with the best score on the test set, we were able to annotate the entire 33K PRs dataset.</p>
-									<p>Once we had our labels, it was time to train our models. We leaned heavily on transformer-based models, utilizing both encoders and decoders, since they’re the go-to for classification and information retrieval tasks. We tried a few models, including Distilbert, Bidirectional LSTM, FASText, and DistilRoBERTa. We also experimented with adding extra input features to the model, like the survey type from the first model to improve the performance of the completion status classification model.</p>
-									<p>And voila! The project came together like a well-oiled machine. Want to get a glimpse of the bigger picture? Check out the complete flow chart of our project below.</p>
+					<p>Hey there! Welcome to our behind-the-scenes look at the creation of a unique AI project that’s
+						helping Rio Tinto keep their finger on the pulse of the mining industry.</p>
+					<p>Imagine this — a system that can wade through the vast ocean of the internet, combing through
+						countless press releases from thousands of resource companies, and finding out the completion
+						status of mining-related geophysics and geochemistry surveys. Sounds like science fiction? Well,
+						it’s the technology for the future that we are developing today. Its aim? To collect all the
+						critical intelligence about planned, in-progress, or recently completed mining-related surveys
+						to help Rio Tinto make savvy investment decisions. Cool, right?</p>
+					<p>The heart of the project is its well-defined focus, a product of numerous chats, debates, and
+						brainstorming sessions with our partners. When we kicked off, we had around 20 overlapping
+						mining-related events to pick from — everything from operational details to financial decisions
+						and personnel changes. With so many possibilities, we did our homework and got familiar with the
+						ins and outs of the mining industry, tracing the mineral exploration roadmap from initial
+						prospecting and surveys all the way to discovery and continuous monitoring.</p>
+					<p>But the jackpot question was — what event should we prioritize for tracking from a business
+						perspective? After a lot of discussions, we and our partners concluded that the most valuable
+						information to follow would be mining-related geophysics or geochemistry surveys, their
+						completion status, and the survey's begin and end dates.</p>
 
-									<span class="image main"><img src="images/rio-tinto/flowchart.png" alt="" /></span>
+					<span class="image main"><img src="images/rio-tinto/survey-types.png" alt="" /></span>
 
-									<hr class="major" />
+					<p>Now, onto the big hurdle: the data we received. Rio Tinto had given us an impressive dataset of
+						around 33,000 press releases, but there was a catch — none of the info about survey type,
+						temporal status, or date was labeled. Yes, you heard it right, a goldmine of information but not
+						a label in sight.</p>
+					<p>We took a swing at several unsupervised learning approaches, like topic modeling using Latent
+						Dirichlet Allocation (LDA), and information retrieval using Facebook’s pretrained Contriver
+						model for zero-shot classification. But the results? Well, let’s just say they left something to
+						be desired.</p>
+					<p>After a solid chat with our academic advisor, Professor Zhu, we realized that a supervised
+						approach could be a game-changer for our performance levels. But how can you supervise without
+						labels? That’s where GPT, one of the most popular large language models, comes in.</p>
+					<p>We designed a workflow that passed the historical dataset through GPT to annotate the data. We
+						started off with a basic prompt to annotate 5000 press releases and used stratified sampling to
+						choose a 130-example test set. We then manually annotated each example and treated them as our
+						ground-truth. By carefully tweaking our prompts and selecting the one with the best score on the
+						test set, we were able to annotate the entire 33K PRs dataset.</p>
+					<p>Once we had our labels, it was time to train our models. We leaned heavily on transformer-based
+						models, utilizing both encoders and decoders, since they’re the go-to for classification and
+						information retrieval tasks. We tried a few models, including Distilbert, Bidirectional LSTM,
+						FASText, and DistilRoBERTa. We also experimented with adding extra input features to the model,
+						like the survey type from the first model to improve the performance of the completion status
+						classification model.</p>
+					<p>And voila! The project came together like a well-oiled machine. Want to get a glimpse of the
+						bigger picture? Check out the complete flow chart of our project below.</p>
 
-									<h2>Data</h2>
-									<p>Let us tell you more about the dataset we are working with.First off, we had to create a press release dataset. But we couldn’t just pull it off some random database, we had to scrape it from the news pages of companies in the mining and natural resources industry. Sounds simple, right? Not exactly.</p>
-									<p>We started with a list of 1090 companies and their respective news directory URLs in a humble csv file. But here’s the kicker, the actual news articles (or press releases) were scattered around the news directory, waiting to be parsed. For example, below is the news directory of Rio Tinto. So we wrote a script that would first fish out the news links on each company’s news directory page, and then wade through each link, one by one. </p>
-									<span class="image main"><img src="images/rio-tinto/news-directory.png" alt="" /></span>
-									
-									<p>By going through this process, we had a shiny new csv file holding 9872 freshly scraped press releases from 638 companies. On top of the textual content we extracted the metadata for the press releases too. So we have the PR titles and published dates, for when they exist, all neatly arranged in our dataset.</p>
-									<p>Some of these press releases were in HTML format, and some in PDF. So, we had to use different scrapers depending on the format. Take a look at our workflow diagram here that shows what this pipeline looks like:</p>
-									<span class="image main"><img src="images/rio-tinto/scraping-flowchart.png" alt="" /></span>
-									<p>Most of the newly scrapped press releases are published between 2020 to 2024, which are quite recent. The average length of each press release is around 900 words. You can see the distribution of the publish dates and the news’ lengths in the dataset:</p>
-									<span class="image main"><img src="images/rio-tinto/publish-date-avg-len-dist.png" alt="" /></span>
-									<hr class="major" />
+					<span class="image main"><img src="images/rio-tinto/flowchart.png" alt="" /></span>
 
-									<h2>Annotating the historical dataset with prompt engineering</h2>
-									<p>After we scraped our initial press release dataset, we turned our attention to annotating the historical dataset provided by our friends at Rio Tinto.</p>
-									<p>This historical dataset was a massive collection of roughly 33,000 press releases. Well, to be exact, the merged first two paragraphs of each, because based on our observations, they contain the most important information for each press release. But here’s where it gets interesting — we then used the GPT-3.5 Turbo model from OpenAI to annotate each press release with survey type information. “Geochemistry Survey,” “Geophysics Survey,” “Both,” and “Others” were the categories we’re talking about. “Both” category is for when a press release mentioned both geochemistry and geophysics surveys, and “Others” is for the ones that didn’t mention either.</p>
-									<p>We didn’t stop there, because GPT was also tasked with determining the completion status of any mentioned survey. The labels were “Planned,” “In-progress,” “Ended,” or “Result-released”.</p>
-									<p>And if the press releases mentioned any dates, GPT would extract the specific start and end dates of the surveys. Check out these distribution charts to see how the survey type and the completion status annotations are spread across our dataset:</p>
-									<span class="image main"><img src="images/rio-tinto/survey-type-temporal-dist.png" alt="" /></span>
-									<p>As an extra step, with the help of the partners from Rio Tinto, we manually annotated 130 examples pulled from the historical dataset. Think of these manual annotations as our gold label, a benchmark to test the accuracy of our GPT labels and model outputs. Since the majority of the PRs fall under the survey type “Others,” a simple random sampling from the historical dataset would not provide us with balanced data to test the results accurately. To address this, we have prompted the GPT again on 5000 samples to obtain their survey type and temporal labels. From these results, we have performed stratified sampling to select 10 examples for each class combination, resulting in a total of 130 samples.</p>
-									<p>Below is the best prompt we used for annotating the survey type. You can check our final report for other prompts we are using for each of the classifications and the date extraction tasks.</p>
-									<span class="image main"><img src="images/rio-tinto/prompt-engineering-pipeline-and-survey-type-prompt.png" alt="" /></span>
+					<hr class="major" />
 
-									<p>Our GPT labels for survey type hit an impressive accuracy score of 0.81 on our test set of 130 examples. When classifying the completion status and extracting dates for those examples identified as a survey by the first model, things got a bit trickier. Some examples were wrongly predicted as “Others” and lacked a completion status or dates. If we include these misclassified examples, our accuracy for the completion status model is 0.77. Exclude them, and our accuracy increases up to 0.92! As for the start and end dates, we correctly labeled these for 73% of all geophysics surveys and 67% of geochemistry surveys.</p>
-									
-									<hr class="major" />
-									<h2>Methods</h2>
-									<h3>Zero-shot attempts and approaches</h3>
-									<p>We tried the following zero-shot methods:</p>
-									<ol>
-										<li>ZeroShot Two Step Classification(based on Facebook Contriever)</li>
-										<li>ZeroShot one step Classification(based on Facebook Contriever)</li>
-										<li>ZeroShot one step Classification(based on Sentence Transformers)</li>
-										<li>BERTopic modeling</li>
-									</ol>
-									<p>ZeroShot Two Step Classification (Facebook Contriever): The ZeroShot Two Step Classification approach based on Facebook Contriever did not meet our expectations due to challenges in determining thresholds and linear relevance scoring. These limitations affected the accuracy and performance of the model.</p>
-									<p>ZeroShot One Step Classification (Facebook Contriever): The ZeroShot One Step Classification approach based on Facebook Contriever did not yield satisfactory results. The model’s performance fell short of expectations, indicating the need for further improvements and alternative approaches.</p>
-									<p>ZeroShot One Step Classification (Sentence Transformers): The ZeroShot One Step Classification approach based on Sentence Transformers showed potential but did not meet our desired level of performance. Although sentence similarity was utilized for classification, the results did not meet expectations, suggesting the need for enhancements and refinements in the model.</p>
-									<p>BERTopic Modeling: BERTopic, a topic modeling technique based on the BERT language model, showed promising results in generating meaningful and interpretable topics from text data. However, during hyperparameter tuning, it was observed that reducing the number of topics adversely affected the model’s performance. Further exploration and optimization are required to improve the performance of BERTopic.</p>
-									<h3>Methods for Training the Classification Model using Supervised Learning</h3>
-									<p>We tried the following supervised learning methods:</p>
-									<ol>
-										<li>Distilbert base</li>
-										<li>Bidirectional LSTM with DistilBERT Base</li>
-										<li>FASText</li>
-										<li>DistilRoBERTa</li>
-									</ol>
-									<p>To develop effective classification models, we trained different models like DistilBERT, FastText, and DistilRoBERTa. We followed a systematic process for training these models, including data preprocessing, tokenization, model initialization, and iterative training to improve performance. Below is the flowchart of the process:</p>
-									<span class="image main"><img src="images/rio-tinto/model-training-flowchart.png" alt="" /></span>
-									<p>After training the models, we evaluated their performance using the testing dataset. We calculated metrics such as accuracy, precision, recall, and F1-score to measure how well the models classified the data. We also generated classification reports and confusion matrices to get a better understanding of their overall performance.</p>
-									<h3>Question-Answering Date Extractive model</h3>
-									<p>For the extraction of dates, we decided to use question answering models. After experimenting with a wide range of models, we decided to go with the Flan-T5 model. </p>
-									<p>To train the Flan-T5 model for date extraction, we uses three inputs which are the survey type, the data type that we want to extract, and the input text containing the actual date. Below is an example showing how we combine those three inputs into a single text using a template.
-									<span class="image main"><img src="images/rio-tinto/date-extraction-inputs.png" alt="" /></span>
+					<h2>Data</h2>
+					<p>Let us tell you more about the dataset we are working with.First off, we had to create a press
+						release dataset. But we couldn’t just pull it off some random database, we had to scrape it from
+						the news pages of companies in the mining and natural resources industry. Sounds simple, right?
+						Not exactly.</p>
+					<p>We started with a list of 1090 companies and their respective news directory URLs in a humble csv
+						file. But here’s the kicker, the actual news articles (or press releases) were scattered around
+						the news directory, waiting to be parsed. For example, below is the news directory of Rio Tinto.
+						So we wrote a script that would first fish out the news links on each company’s news directory
+						page, and then wade through each link, one by one. </p>
+					<span class="image main"><img src="images/rio-tinto/news-directory.png" alt="" /></span>
 
-									<p>Following this system, we extracted the start and end date of the specified survey type. In cases where the survey type was ‘Other’, we skipped it. In cases where the survey type was ‘Both’, we predicted the start and end times for both Geophysical and Geochemical survey.</p>
-									<p>Since the model makes predictions in all cases, including the ones where a date is not present, we need to filter out the predictions where there is no date. For this, we first tried using scores to filter out irrelevant predictions. This was not as effective as expected, hence, we used a date parser to detect the presence of a date and standardize it. We also tried to filter out all the entries which were not able to be standardized. By doing this, we did lose some valid predictions, which led to a lower accuracy.</p>
-									<p>We finally used a combination of scoring and standardization to filter the results. This resulted in a much better output which consists only of dates. Below are one example of end date extraction:</p>
-									<span class="image main"><img src="images/rio-tinto/end-date-extraction-example.png" alt="" /></span>
-									
-									<hr class="major" />
-									<h2>Evaluation & Analysis of the Models</h2>
-									<h3>DistilBert</h3>
-									<p>For the evaluation of classification models, specifically the DistilBERT model using a two-step classification approach, we utilized a dataset comprising 33,000 data points generated for the training model.</p>
-									<p>To address the class imbalance issue, downsampling was applied to ensure a more balanced distribution of the labels. By reducing the instances of the majority classes, we aimed to improve the model’s ability to learn and generalize across all classes.</p>
-									<p>We trained the above model on distill bert on num_epochs = 20, batch_size = 32, and used a test set of 130 human labeled dates for evaluation of dates. Below are results produced from 130 sample dataset:</p>
-									<p>Survey type labels predictions on 130 examples human test set: Accuracy: 71.54%</p>
-									<span class="image main"><img src="images/rio-tinto/DistilBert-surveytype.png" alt="" /></span>
-									<p>Survey temporal status labels predictions: Accuracy: 86.15%</p>
-									<span class="image main"><img src="images/rio-tinto/DistilBert-surveytemporalstatus.png" alt="" /></span>
-									<p>After removing the “not labeled” data, the total number of data points decreased to 65. Consequently, the accuracy improved significantly. However, the f1-score for the “planned” category decreased to 0.33.</p>
-									
-									<h3>FASText</h3>
-									<p>We also used a text classification approach using the FastText algorithm. FastText, developed by Facebook’s AI Research (FAIR), is a powerful library that offers efficient solutions for text classification and representation learning. By representing words as character n-grams, FastText captures valuable word-level and subword-level information. Our goal was to leverage FastText for classification on labeled text data.</p>
-									<p>The performance achieved for the survey type classification on 130 test set is as follows:</p>
-									<span class="image main"><img src="images/rio-tinto/FASText-surveytype.png" alt="" /></span>
-									<p>The performance achieved for the temporal status classification is as follows:</p>
-									<span class="image main"><img src="images/rio-tinto/FASText-surveytemporalstatus.png" alt="" /></span>
-									
-									<h3>DistilRoBERTa</h3>
-									<p>We also tried the DistilRoBERTa model for two step classification tasks. For survey type classification, we directly fed the first two paragraphs of press release as input to train the model, while for temporal classification, we fed the first two paragraphs of press release and the survey type as two inputs for the model to classify into Ended, In-progress and Planned. The classification report for the results is shown below:</p>
-									<p>The performance achieved for the survey type classification is as follows:</p>
-									<span class="image main"><img src="images/rio-tinto/DistilRoBERTa-surveytype.png" alt="" /></span>
-									<p>The performance achieved for the temporal status classification is as follows:</p>
-									<span class="image main"><img src="images/rio-tinto/DistilRoBERTa-surveytemporalstatus.png" alt="" /></span>
-									
-									<p>In our exploration of classification approaches, we noted BERT-based methods such as BERTopic and DistilBERT to be remarkably effective, especially for 'label' classification tasks. FastText too performed well, thanks to its use of word embeddings.</p>
-									<p>However, not all results hit the mark. The zero-shot Contriever and DistilBERT enhanced with bidirectional LSTM and pooling, failed to deliver expected improvements. This underperformance signals potential difficulties in defining thresholds and issues with linear relevance scoring.</p>
-									<p>A key insight from our analysis was DistilBERT's contrasting performance - exceptional accuracy for 'label' classification, but a downturn for 'temporal_label' classification. This discrepancy underscores the need to refine our training data and labeling process.</p>
-									<p>Our system, notably, leans towards generating more false positives than false negatives - a concern as it may cause misclassifications and inaccuracies, impacting the system's overall reliability.</p>
-									<p>While we haven't analyzed results from time-stamped data or long-term trends, it’s noteworthy that despite our survey-type classification falling short of DistilBERT, it outperforms the latter in temporal status. This improvement could be due to the additional contextual information provided to the model, like the type of survey.</p>
-									
-									<h3>Question-Answering Date Extractive model (Flan-T5)</h3>
-									<p>We recently evaluated our dates extraction model using a test set of 130 human-labeled data points, and the date extractive model achieve an overall accuracy of 50.54%. </p>
-									<p>Although our date extraction model fell short of GPT's performance — with GPT achieving 73% accuracy for the geophysics survey and 67% for the geochemistry survey — it's crucial to dive deeper into the figures to gain a comprehensive understanding.</p>
-									<p>The finer points behind the results are:</p>
-									<ol>
-										<li>Standardization: When the model encounters incomplete date information, it defaults to the current date for the missing data. For example, an input of '2013' is predicted as '2013-06-14', assuming the current date is June 14. This standardization leads to an apparent mismatch in accuracy calculations, although, in essence, the year is correctly predicted.</li>
-										<li>Formats: The model stumbles when it comes to unconventional date formats like 'Mid-July', which it can't readily standardize to a specific date. In these cases, the output is marked as N/A, leading to an apparent mismatch despite the actual dates overlapping.</li>
-										<li>Concluded Surveys: When a survey concludes, it may not always make sense to have separate start and end dates. For instance, if a survey ends on December 6, the model predicts the start date as December 6 while marking the end date as N/A. While this result gives us the necessary information, it technically counts as a mismatch due to the data being in different columns.</li>
-									</ol>
-									<p>These nuances highlight the need for an in-depth understanding of accuracy calculations beyond the raw percentage figures. Despite the lower accuracy, our model still provides valuable date information — you just need to know where to look!</p>
+					<p>By going through this process, we had a shiny new csv file holding 9872 freshly scraped press
+						releases from 638 companies. On top of the textual content we extracted the metadata for the
+						press releases too. So we have the PR titles and published dates, for when they exist, all
+						neatly arranged in our dataset.</p>
+					<p>Some of these press releases were in HTML format, and some in PDF. So, we had to use different
+						scrapers depending on the format. Take a look at our workflow diagram here that shows what this
+						pipeline looks like:</p>
+					<span class="image main"><img src="images/rio-tinto/scraping-flowchart.png" alt="" /></span>
+					<p>Most of the newly scrapped press releases are published between 2020 to 2024, which are quite
+						recent. The average length of each press release is around 900 words. You can see the
+						distribution of the publish dates and the news’ lengths in the dataset:</p>
+					<span class="image main"><img src="images/rio-tinto/publish-date-avg-len-dist.png" alt="" /></span>
+					<hr class="major" />
 
-									<hr class="major" />
-									<h2>Future work</h2>
-									<p>There are also some additional work we can do in the future to further improve our project:</p>
-									<h3>Expanding test set to make the distribution of each class more balanced</h3>
-									<p>We used a manually labeled 130 examples test set to verify the accuracies of the classification and date labels produced by GPT, and choose the prompts that produced the highest accuracies as the prompt we used to generate the training labels. However, the manual labeling procedure is only performed after we select 10 samples from each class combination from a historical dataset, based on the results of an initial labeling using a baseline GPT prompt. Since the baseline prompts are written before the start of prompt engineering, they not produce the results as accurately as our best prompts. As a result, some stratified samples do not actually belong to the class combinations that they were initially labeled, resulting in an unbalanced 130 examples test set, especially for the completion status labels — the majority of the labels in the 130 test set actually belongs to “Ended or Result-released”, and there are fewer examples in the “Planned” and “In-progress”. Therefore, in the future the 130 test set can be expanded to have balanced representations of examples in each class.</p>
-									<h3>Further improve the performance of the date extraction models</h3>
-									<p>While we achieve a relatively high accuracy on both of the classification models, we could work on improving the accuracy of our dates extraction model. We should accommodate more date formats so the system doesn’t ignore a lot of valid predictions.</p>
-									<p>Another suggestion to improve our accuracy is to also take into account the temporal classification when training the models to make inference. For example, when the temporal status for a particular survey is “Planned” or “Ended or Result Released”, then it wouldn’t make sense to predict the separate start or end date for the survey, since a survey could be planned or ended only in a single moment in time. Therefore, in the future we could consider training separate date extraction models for different types of the press releases.</p>
+					<h2>Annotating the historical dataset with prompt engineering</h2>
+					<p>After we scraped our initial press release dataset, we turned our attention to annotating the
+						historical dataset provided by our friends at Rio Tinto.</p>
+					<p>This historical dataset was a massive collection of roughly 33,000 press releases. Well, to be
+						exact, the merged first two paragraphs of each, because based on our observations, they contain
+						the most important information for each press release. But here’s where it gets interesting — we
+						then used the GPT-3.5 Turbo model from OpenAI to annotate each press release with survey type
+						information. “Geochemistry Survey,” “Geophysics Survey,” “Both,” and “Others” were the
+						categories we’re talking about. “Both” category is for when a press release mentioned both
+						geochemistry and geophysics surveys, and “Others” is for the ones that didn’t mention either.
+					</p>
+					<p>We didn’t stop there, because GPT was also tasked with determining the completion status of any
+						mentioned survey. The labels were “Planned,” “In-progress,” “Ended,” or “Result-released”.</p>
+					<p>And if the press releases mentioned any dates, GPT would extract the specific start and end dates
+						of the surveys. Check out these distribution charts to see how the survey type and the
+						completion status annotations are spread across our dataset:</p>
+					<span class="image main"><img src="images/rio-tinto/survey-type-temporal-dist.png" alt="" /></span>
+					<p>As an extra step, with the help of the partners from Rio Tinto, we manually annotated 130
+						examples pulled from the historical dataset. Think of these manual annotations as our gold
+						label, a benchmark to test the accuracy of our GPT labels and model outputs. Since the majority
+						of the PRs fall under the survey type “Others,” a simple random sampling from the historical
+						dataset would not provide us with balanced data to test the results accurately. To address this,
+						we have prompted the GPT again on 5000 samples to obtain their survey type and temporal labels.
+						From these results, we have performed stratified sampling to select 10 examples for each class
+						combination, resulting in a total of 130 samples.</p>
+					<p>Below is the best prompt we used for annotating the survey type. You can check our final report
+						for other prompts we are using for each of the classifications and the date extraction tasks.
+					</p>
+					<span class="image main"><img
+							src="images/rio-tinto/prompt-engineering-pipeline-and-survey-type-prompt.png"
+							alt="" /></span>
 
-									<hr class="major" />
-									<h2>Conclusion</h2>
-									<p>And there you have it! From scraping mining-related press releases to training machine learning models and to dealing with challenges of label-less data — it’s been quite a journey! As we dig deeper into this project, we’re continually refining our models, learning more about the nuances of the mining industry, and improving our strategies for data balance and accuracy.</p>
-									<p>We’re extremely grateful to have had this opportunity to work with Rio Tinto and create something meaningful and valuable for the mining industry. It’s been an enlightening journey and we’re eager to continue this work, pushing the boundaries of what machine learning can achieve.</p>
-									<p>Thank you for following along with us on this adventure. Remember, the exciting world of data science is a journey, not a destination, and there are always new frontiers to explore. We can’t wait to share more of our findings and experiences with you. Stay tuned and until then, keep discovering!</p>
-								</section>
+					<p>Our GPT labels for survey type hit an impressive accuracy score of 0.81 on our test set of 130
+						examples. When classifying the completion status and extracting dates for those examples
+						identified as a survey by the first model, things got a bit trickier. Some examples were wrongly
+						predicted as “Others” and lacked a completion status or dates. If we include these misclassified
+						examples, our accuracy for the completion status model is 0.77. Exclude them, and our accuracy
+						increases up to 0.92! As for the start and end dates, we correctly labeled these for 73% of all
+						geophysics surveys and 67% of geochemistry surveys.</p>
 
-						</div>
-					</div>
+					<hr class="major" />
+					<h2>Methods</h2>
+					<h3>Zero-shot attempts and approaches</h3>
+					<p>We tried the following zero-shot methods:</p>
+					<ol>
+						<li>ZeroShot Two Step Classification(based on Facebook Contriever)</li>
+						<li>ZeroShot one step Classification(based on Facebook Contriever)</li>
+						<li>ZeroShot one step Classification(based on Sentence Transformers)</li>
+						<li>BERTopic modeling</li>
+					</ol>
+					<p>ZeroShot Two Step Classification (Facebook Contriever): The ZeroShot Two Step Classification
+						approach based on Facebook Contriever did not meet our expectations due to challenges in
+						determining thresholds and linear relevance scoring. These limitations affected the accuracy and
+						performance of the model.</p>
+					<p>ZeroShot One Step Classification (Facebook Contriever): The ZeroShot One Step Classification
+						approach based on Facebook Contriever did not yield satisfactory results. The model’s
+						performance fell short of expectations, indicating the need for further improvements and
+						alternative approaches.</p>
+					<p>ZeroShot One Step Classification (Sentence Transformers): The ZeroShot One Step Classification
+						approach based on Sentence Transformers showed potential but did not meet our desired level of
+						performance. Although sentence similarity was utilized for classification, the results did not
+						meet expectations, suggesting the need for enhancements and refinements in the model.</p>
+					<p>BERTopic Modeling: BERTopic, a topic modeling technique based on the BERT language model, showed
+						promising results in generating meaningful and interpretable topics from text data. However,
+						during hyperparameter tuning, it was observed that reducing the number of topics adversely
+						affected the model’s performance. Further exploration and optimization are required to improve
+						the performance of BERTopic.</p>
+					<h3>Methods for Training the Classification Model using Supervised Learning</h3>
+					<p>We tried the following supervised learning methods:</p>
+					<ol>
+						<li>Distilbert base</li>
+						<li>Bidirectional LSTM with DistilBERT Base</li>
+						<li>FASText</li>
+						<li>DistilRoBERTa</li>
+					</ol>
+					<p>To develop effective classification models, we trained different models like DistilBERT,
+						FastText, and DistilRoBERTa. We followed a systematic process for training these models,
+						including data preprocessing, tokenization, model initialization, and iterative training to
+						improve performance. Below is the flowchart of the process:</p>
+					<span class="image main"><img src="images/rio-tinto/model-training-flowchart.png" alt="" /></span>
+					<p>After training the models, we evaluated their performance using the testing dataset. We
+						calculated metrics such as accuracy, precision, recall, and F1-score to measure how well the
+						models classified the data. We also generated classification reports and confusion matrices to
+						get a better understanding of their overall performance.</p>
+					<h3>Question-Answering Date Extractive model</h3>
+					<p>For the extraction of dates, we decided to use question answering models. After experimenting
+						with a wide range of models, we decided to go with the Flan-T5 model. </p>
+					<p>To train the Flan-T5 model for date extraction, we uses three inputs which are the survey type,
+						the data type that we want to extract, and the input text containing the actual date. Below is
+						an example showing how we combine those three inputs into a single text using a template.
+						<span class="image main"><img src="images/rio-tinto/date-extraction-inputs.png" alt="" /></span>
 
-				<!-- Sidebar -->
-				<div id="sidebar">
-					<div class="inner">
+					<p>Following this system, we extracted the start and end date of the specified survey type. In cases
+						where the survey type was ‘Other’, we skipped it. In cases where the survey type was ‘Both’, we
+						predicted the start and end times for both Geophysical and Geochemical survey.</p>
+					<p>Since the model makes predictions in all cases, including the ones where a date is not present,
+						we need to filter out the predictions where there is no date. For this, we first tried using
+						scores to filter out irrelevant predictions. This was not as effective as expected, hence, we
+						used a date parser to detect the presence of a date and standardize it. We also tried to filter
+						out all the entries which were not able to be standardized. By doing this, we did lose some
+						valid predictions, which led to a lower accuracy.</p>
+					<p>We finally used a combination of scoring and standardization to filter the results. This resulted
+						in a much better output which consists only of dates. Below are one example of end date
+						extraction:</p>
+					<span class="image main"><img src="images/rio-tinto/end-date-extraction-example.png"
+							alt="" /></span>
 
-						<!-- Search -->
-							<section id="search" class="alt">
-								<form method="post" action="#">
-									<input type="text" name="query" id="query" placeholder="Search" />
-								</form>
-							</section>
+					<hr class="major" />
+					<h2>Evaluation & Analysis of the Models</h2>
+					<h3>DistilBert</h3>
+					<p>For the evaluation of classification models, specifically the DistilBERT model using a two-step
+						classification approach, we utilized a dataset comprising 33,000 data points generated for the
+						training model.</p>
+					<p>To address the class imbalance issue, downsampling was applied to ensure a more balanced
+						distribution of the labels. By reducing the instances of the majority classes, we aimed to
+						improve the model’s ability to learn and generalize across all classes.</p>
+					<p>We trained the above model on distill bert on num_epochs = 20, batch_size = 32, and used a test
+						set of 130 human labeled dates for evaluation of dates. Below are results produced from 130
+						sample dataset:</p>
+					<p>Survey type labels predictions on 130 examples human test set: Accuracy: 71.54%</p>
+					<span class="image main"><img src="images/rio-tinto/DistilBert-surveytype.png" alt="" /></span>
+					<p>Survey temporal status labels predictions: Accuracy: 86.15%</p>
+					<span class="image main"><img src="images/rio-tinto/DistilBert-surveytemporalstatus.png"
+							alt="" /></span>
+					<p>After removing the “not labeled” data, the total number of data points decreased to 65.
+						Consequently, the accuracy improved significantly. However, the f1-score for the “planned”
+						category decreased to 0.33.</p>
 
-						<!-- Menu -->
-							<nav id="menu">
-								<header class="major">
-									<h2>Menu</h2>
-								</header>
-								<ul>
-									<li><a href="index.html">Homepage</a></li>
-									<li><a href="certificates.html">Certificates</a></li>
-									<!-- <li><a href="generic.html">Generic</a></li>
+					<h3>FASText</h3>
+					<p>We also used a text classification approach using the FastText algorithm. FastText, developed by
+						Facebook’s AI Research (FAIR), is a powerful library that offers efficient solutions for text
+						classification and representation learning. By representing words as character n-grams, FastText
+						captures valuable word-level and subword-level information. Our goal was to leverage FastText
+						for classification on labeled text data.</p>
+					<p>The performance achieved for the survey type classification on 130 test set is as follows:</p>
+					<span class="image main"><img src="images/rio-tinto/FASText-surveytype.png" alt="" /></span>
+					<p>The performance achieved for the temporal status classification is as follows:</p>
+					<span class="image main"><img src="images/rio-tinto/FASText-surveytemporalstatus.png"
+							alt="" /></span>
+
+					<h3>DistilRoBERTa</h3>
+					<p>We also tried the DistilRoBERTa model for two step classification tasks. For survey type
+						classification, we directly fed the first two paragraphs of press release as input to train the
+						model, while for temporal classification, we fed the first two paragraphs of press release and
+						the survey type as two inputs for the model to classify into Ended, In-progress and Planned. The
+						classification report for the results is shown below:</p>
+					<p>The performance achieved for the survey type classification is as follows:</p>
+					<span class="image main"><img src="images/rio-tinto/DistilRoBERTa-surveytype.png" alt="" /></span>
+					<p>The performance achieved for the temporal status classification is as follows:</p>
+					<span class="image main"><img src="images/rio-tinto/DistilRoBERTa-surveytemporalstatus.png"
+							alt="" /></span>
+
+					<p>In our exploration of classification approaches, we noted BERT-based methods such as BERTopic and
+						DistilBERT to be remarkably effective, especially for 'label' classification tasks. FastText too
+						performed well, thanks to its use of word embeddings.</p>
+					<p>However, not all results hit the mark. The zero-shot Contriever and DistilBERT enhanced with
+						bidirectional LSTM and pooling, failed to deliver expected improvements. This underperformance
+						signals potential difficulties in defining thresholds and issues with linear relevance scoring.
+					</p>
+					<p>A key insight from our analysis was DistilBERT's contrasting performance - exceptional accuracy
+						for 'label' classification, but a downturn for 'temporal_label' classification. This discrepancy
+						underscores the need to refine our training data and labeling process.</p>
+					<p>Our system, notably, leans towards generating more false positives than false negatives - a
+						concern as it may cause misclassifications and inaccuracies, impacting the system's overall
+						reliability.</p>
+					<p>While we haven't analyzed results from time-stamped data or long-term trends, it’s noteworthy
+						that despite our survey-type classification falling short of DistilBERT, it outperforms the
+						latter in temporal status. This improvement could be due to the additional contextual
+						information provided to the model, like the type of survey.</p>
+
+					<h3>Question-Answering Date Extractive model (Flan-T5)</h3>
+					<p>We recently evaluated our dates extraction model using a test set of 130 human-labeled data
+						points, and the date extractive model achieve an overall accuracy of 50.54%. </p>
+					<p>Although our date extraction model fell short of GPT's performance — with GPT achieving 73%
+						accuracy for the geophysics survey and 67% for the geochemistry survey — it's crucial to dive
+						deeper into the figures to gain a comprehensive understanding.</p>
+					<p>The finer points behind the results are:</p>
+					<ol>
+						<li>Standardization: When the model encounters incomplete date information, it defaults to the
+							current date for the missing data. For example, an input of '2013' is predicted as
+							'2013-06-14', assuming the current date is June 14. This standardization leads to an
+							apparent mismatch in accuracy calculations, although, in essence, the year is correctly
+							predicted.</li>
+						<li>Formats: The model stumbles when it comes to unconventional date formats like 'Mid-July',
+							which it can't readily standardize to a specific date. In these cases, the output is marked
+							as N/A, leading to an apparent mismatch despite the actual dates overlapping.</li>
+						<li>Concluded Surveys: When a survey concludes, it may not always make sense to have separate
+							start and end dates. For instance, if a survey ends on December 6, the model predicts the
+							start date as December 6 while marking the end date as N/A. While this result gives us the
+							necessary information, it technically counts as a mismatch due to the data being in
+							different columns.</li>
+					</ol>
+					<p>These nuances highlight the need for an in-depth understanding of accuracy calculations beyond
+						the raw percentage figures. Despite the lower accuracy, our model still provides valuable date
+						information — you just need to know where to look!</p>
+
+					<hr class="major" />
+					<h2>Future work</h2>
+					<p>There are also some additional work we can do in the future to further improve our project:</p>
+					<h3>Expanding test set to make the distribution of each class more balanced</h3>
+					<p>We used a manually labeled 130 examples test set to verify the accuracies of the classification
+						and date labels produced by GPT, and choose the prompts that produced the highest accuracies as
+						the prompt we used to generate the training labels. However, the manual labeling procedure is
+						only performed after we select 10 samples from each class combination from a historical dataset,
+						based on the results of an initial labeling using a baseline GPT prompt. Since the baseline
+						prompts are written before the start of prompt engineering, they not produce the results as
+						accurately as our best prompts. As a result, some stratified samples do not actually belong to
+						the class combinations that they were initially labeled, resulting in an unbalanced 130 examples
+						test set, especially for the completion status labels — the majority of the labels in the 130
+						test set actually belongs to “Ended or Result-released”, and there are fewer examples in the
+						“Planned” and “In-progress”. Therefore, in the future the 130 test set can be expanded to have
+						balanced representations of examples in each class.</p>
+					<h3>Further improve the performance of the date extraction models</h3>
+					<p>While we achieve a relatively high accuracy on both of the classification models, we could work
+						on improving the accuracy of our dates extraction model. We should accommodate more date formats
+						so the system doesn’t ignore a lot of valid predictions.</p>
+					<p>Another suggestion to improve our accuracy is to also take into account the temporal
+						classification when training the models to make inference. For example, when the temporal status
+						for a particular survey is “Planned” or “Ended or Result Released”, then it wouldn’t make sense
+						to predict the separate start or end date for the survey, since a survey could be planned or
+						ended only in a single moment in time. Therefore, in the future we could consider training
+						separate date extraction models for different types of the press releases.</p>
+
+					<hr class="major" />
+					<h2>Conclusion</h2>
+					<p>And there you have it! From scraping mining-related press releases to training machine learning
+						models and to dealing with challenges of label-less data — it’s been quite a journey! As we dig
+						deeper into this project, we’re continually refining our models, learning more about the nuances
+						of the mining industry, and improving our strategies for data balance and accuracy.</p>
+					<p>We’re extremely grateful to have had this opportunity to work with Rio Tinto and create something
+						meaningful and valuable for the mining industry. It’s been an enlightening journey and we’re
+						eager to continue this work, pushing the boundaries of what machine learning can achieve.</p>
+					<p>Thank you for following along with us on this adventure. Remember, the exciting world of data
+						science is a journey, not a destination, and there are always new frontiers to explore. We can’t
+						wait to share more of our findings and experiences with you. Stay tuned and until then, keep
+						discovering!</p>
+				</section>
+
+			</div>
+		</div>
+
+		<!-- Sidebar -->
+		<div id="sidebar">
+			<div class="inner">
+
+				<!-- Search -->
+				<section id="search" class="alt">
+					<form method="post" action="#">
+						<input type="text" name="query" id="query" placeholder="Search" />
+					</form>
+				</section>
+
+				<!-- Menu -->
+				<nav id="menu">
+					<header class="major">
+						<h2>Menu</h2>
+					</header>
+					<ul>
+						<li><a href="index.html">Homepage</a></li>
+						<li><a href="certificates.html">Certificates</a></li>
+						<!-- <li><a href="generic.html">Generic</a></li>
 									<li><a href="elements.html">Elements</a></li>
 									<li>
 										<span class="opener">Submenu</span>
@@ -223,63 +404,75 @@
 									<li><a href="#">Maximus Erat</a></li>
 									<li><a href="#">Sapien Mauris</a></li>
 									<li><a href="#">Amet Lacinia</a></li> -->
-								</ul>
-							</nav>
+					</ul>
+				</nav>
 
-						<!-- Section -->
-							<section>
-								<header class="major">
-									<h2>Recent blogs</h2>
-								</header>
-								<div class="mini-posts">
-									<article>
-										<a href="rio-tinto.html" class="image"><img src="images/rio-tinto/mining-event-tracker-thumbnails.png" alt="" /></a>
-										<p>Uses AI to analyze online press releases, to track mining-related surveys and their completion timelines, to help Rio Tinto better invest.</p>
-									</article>
-									<article>
-										<a href="mini-gpt.html" class="image"><img src="images/mini-gpt/coverpage.png" alt="" /></a>
-										<p>Train your own large language models (LLMs) to generate industry-specific responses, using reinforcement learning and memory optimization techniques.</p>
-									</article>
-									<!-- <article>
+				<!-- Section -->
+				<section>
+					<header class="major">
+						<h2>Recent blogs</h2>
+					</header>
+					<div class="mini-posts">
+						<article>
+							<a href="lenovo-vllm-deploy.html" class="image"><img
+									src="images/lenovo/coverpage-simplified.png" alt="" /></a>
+							<p>Discover how to scale generative AI applications cost-effectively by deploying
+								open-source models with vLLM on Kubernetes, enabling high-volume data processing without
+								relying on expensive third-party APIs.</p>
+						</article>
+						<article>
+							<a href="rio-tinto.html" class="image"><img
+									src="images/rio-tinto/mining-event-tracker-thumbnails.png" alt="" /></a>
+							<p>Uses AI to analyze online press releases, to track mining-related surveys and their
+								completion timelines, to help Rio Tinto better invest.</p>
+						</article>
+						<article>
+							<a href="mini-gpt.html" class="image"><img src="images/mini-gpt/coverpage.png" alt="" /></a>
+							<p>Train your own large language models (LLMs) to generate industry-specific responses,
+								using reinforcement learning and memory optimization techniques.</p>
+						</article>
+						<!-- <article>
 										<a href="#" class="image"><img src="images/pic09.jpg" alt="" /></a>
 										<p>Aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore aliquam.</p>
 									</article> -->
-								</div>
-								<ul class="actions">
-									<li><a href="#" class="button">More</a></li>
-								</ul>
-							</section>
-
-						<!-- Section -->
-							<section>
-								<header class="major">
-									<h2>Get in touch</h2>
-								</header>
-								<p>If you are interested in learning more about my work, feel free to get in touch.</p>
-								<ul class="contact">
-									<li class="icon solid fa-envelope"><a href="#">zhangzhipian97@outlook.com</a></li>
-									<li class="icon solid fa-phone">(604) 720-2269</li>
-									<!-- <li class="icon solid fa-home">1234 Somewhere Road #8254<br />
-									Nashville, TN 00000-0000</li> -->
-								</ul>
-							</section>
-
-						<!-- Footer -->
-							<footer id="footer">
-								<p class="copyright">&copy; Zhipian Zhang. All rights reserved. Demo Images: <a href="">Unsplash</a>. Design: <a href="">HTML5 UP</a>.</p>
-							</footer>
-
 					</div>
-				</div>
+					<ul class="actions">
+						<li><a href="#" class="button">More</a></li>
+					</ul>
+				</section>
+
+				<!-- Section -->
+				<section>
+					<header class="major">
+						<h2>Get in touch</h2>
+					</header>
+					<p>If you are interested in learning more about my work, feel free to get in touch.</p>
+					<ul class="contact">
+						<li class="icon solid fa-envelope"><a href="#">zhangzhipian1@gmail.com</a></li>
+						<li class="icon solid fa-phone">(604) 720-2269</li>
+						<!-- <li class="icon solid fa-home">1234 Somewhere Road #8254<br />
+									Nashville, TN 00000-0000</li> -->
+					</ul>
+				</section>
+
+				<!-- Footer -->
+				<footer id="footer">
+					<p class="copyright">&copy; Zhipian Zhang. All rights reserved. Demo Images: <a
+							href="">Unsplash</a>. Design: <a href="">HTML5 UP</a>.</p>
+				</footer>
 
 			</div>
+		</div>
 
-		<!-- Scripts -->
-			<script src="assets/js/jquery.min.js"></script>
-			<script src="assets/js/browser.min.js"></script>
-			<script src="assets/js/breakpoints.min.js"></script>
-			<script src="assets/js/util.js"></script>
-			<script src="assets/js/main.js"></script>
+	</div>
 
-	</body>
+	<!-- Scripts -->
+	<script src="assets/js/jquery.min.js"></script>
+	<script src="assets/js/browser.min.js"></script>
+	<script src="assets/js/breakpoints.min.js"></script>
+	<script src="assets/js/util.js"></script>
+	<script src="assets/js/main.js"></script>
+
+</body>
+
 </html>

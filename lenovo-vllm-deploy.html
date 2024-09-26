@@ -1,0 +1,645 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+
+<head>
+	<title>Blog - Alex (Zhipian) Zhang</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<link rel="stylesheet" href="assets/css/main.css" />
+	<!-- Include Prism.js CSS -->
+	<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" /> -->
+	<link rel="stylesheet" href="assets/css/prism.css" />
+
+</head>
+
+<body class="is-preload">
+
+	<!-- Wrapper -->
+	<div id="wrapper">
+
+		<!-- Main -->
+		<div id="main">
+			<div class="inner">
+
+				<!-- Header -->
+				<header id="header">
+					<a href="rio-tinto.html" class="logo"><strong>Blog Post</strong> by Alex (Zhipian) Zhang</a>
+					<ul class="icons">
+						<li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
+						<li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
+						<li><a href="#" class="icon brands fa-snapchat-ghost"><span class="label">Snapchat</span></a>
+						</li>
+						<li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
+						<li><a href="#" class="icon brands fa-medium-m"><span class="label">Medium</span></a></li>
+					</ul>
+				</header>
+
+				<!-- Content -->
+				<section>
+					<style>
+						/* Set max-width for elements with class names starting with 'language-' */
+						[class^="language-"] {
+							max-width: 1200px;
+						}
+					</style>
+					<header>
+						<h1>Scaling Generative AI with vLLM and Kubernetes</h1>
+					</header>
+					<span class="image main"><img src="images/lenovo/coverpage.png" alt="" /></span>
+					<p>When you embark on developing AI applications using generative AI, it's common to integrate a
+						service like OpenAI's API at some stage of your project's evolution. This makes sense because
+						their API is well-designed, efficient, and supported by excellent libraries. For small-scale
+						projects or when you're just starting out, using OpenAI can be quite cost-effective. Moreover,
+						there's a wealth of valuable educational material available that guides you through building AI
+						applications and understanding complex techniques with OpenAI's API.</p>
+					<p>One of my favorite resources is the <a href="https://cookbook.openai.com/">OpenAI Cookbook</a>;
+						it's an outstanding way to begin learning
+						how different models operate, how to leverage cutting-edge techniques in the AI field, and how
+						to integrate your own data with AI workloads.</p>
+					<p>However, when you need to scale up your generative AI operations, you'll quickly face a
+						significant hurdle: the cost. As you begin generating thousands—and eventually tens of
+						thousands—of product descriptions, comparisons, or other forms of content using models like
+						GPT-4, or even the more affordable GPT-3.5 models, you'll notice your OpenAI bill escalating
+						into the thousands of dollars each month.</p>
+					<p>Fortunately, for agile and small teams, there are many excellent options available for deploying
+						low-cost, open-source technologies that can mimic an OpenAI-compatible API while utilizing the
+						latest open-source models. In many cases, these models can match the performance of the GPT-3.5
+						class of models.</p>
+					<p>This was the situation we encountered when building the infrastructure for a new AI-powered
+						product catalog: we needed a data pipeline that would continuously generate summaries and
+						embeddings of electronic product documentation to perform a "needle in the haystack" cosine
+						similarity search in our vector store as part of a Retrieval Augmented Generation (RAG) flow.
+						RAG is a powerful technique that allows you to provide additional context and search results to
+						a large language model, enabling it to generate much more accurate and context-aware responses
+						to queries related to your specific product data.</p>
+					<h2>Basic RAG</h2>
+					<span class="image main"><img src="images/lenovo/basic-rag.png" alt="" /></span>
+					<p>In our case, performing a cosine similarity search on top of a vector store enhances this RAG
+						flow even further. Since much of our product data is unstructured and complex, traditional
+						full-text search would be inefficient. Instead, we create vector embeddings based on
+						AI-generated summaries of relevant product attributes in our database. These vectors,
+						essentially sequences of numbers, represent an "understanding" from an embedding model that can
+						be used alongside query vector embeddings to find the "nearest neighbor" data relevant to the
+						user's query.</p>
+					<h2>Advanced RAG Methods Using Vector Stores</h2>
+					<!-- <p><img src="flowchart1.png" alt="Flowchart 1"></p> -->
+					<span class="image main"><img src="images/lenovo/rag-flowchart.png" alt="" /></span>
+
+					<p>Initially, for the product summary generation part of our RAG data pipeline, we were using OpenAI
+						directly. We aimed to capture detailed information about thousands of different hardware and
+						software products in our catalog, with over 3,000 new product manuals or documentation added
+						daily. This approach allowed anyone to inquire about and gain unique insights into the
+						specifications, features, and compatibility of products across the tech ecosystem. However, as
+						thousands of new products are continually added or updated in our catalog, on any given day,
+						over 3,000 documents would flow through our summarization pipeline. Moreover, upwards of 150,000
+						pages within those 3,000+ documents would need to be analyzed by LLMs to extract the entities
+						and relationships mentioned on each page for constructing a knowledge graph for each product.
+						This rapidly became unsustainable cost-wise due to the sheer volume of calls and the number of
+						tokens sent to the OpenAI API.</p>
+					<h2>Architecture of the Vector Generation Data Pipeline</h2>
+					<span class="image main"><img src="images/lenovo/vector-gen-openai.png" alt="" /></span>
+					<p>At this scale, we quickly ran into "cost" bottlenecks. We considered further optimizing our usage
+						of OpenAI's APIs to reduce expenses but realized there was a compelling alternative using
+						open-source technologies at a significantly lower cost, capable of achieving the same goal at
+						our target scale.</p>
+					<p>Although this post won't delve deeply into how we implemented the RAG pipeline for our product
+						catalog, I will outline how we bootstrapped the infrastructure, deploying the open-sourced LLM
+						to process tens of thousands of
+						product entries, generate AI-powered summaries, and identify entities and their relationships in
+						each product entries.
+						(NER).
+
+						We utilized the generated NER triples to build a knowledge graph for enhanced graph search, with
+						the help of LlamaIndex, which coordinates the entire process, from calling our AI endpoint for
+						NER
+						extraction to constructing the Neo4j graph. LlamaIndex facilitates prompt engineering, data
+						parsing, and entity relationship extraction, while also allowing us to specify the endpoints for
+						various AI services seamlessly. For more details on the graph search process, you can refer to
+						the links below. By combining this graph search with a nearest neighbor vector search using vLLM
+						and Kubernetes, we were able to surface highly relevant, detailed information about a diverse
+						range of products. The integration of graph search capabilities with traditional vector search
+						provided deeper insights and a more comprehensive contextual understanding of the tech
+						ecosystem, significantly improving our ability to "understand" and analyze trends in the
+						computing market.
+					</p>
+					<p>There's much more to discuss about RAG, vector search and knowledge graph search—I recommend the
+						following resources:</p>
+					<ul>
+						<li><a href="#">A beginner's guide to building a Retrieval Augmented Generation (RAG)
+								application from scratch</a></li>
+						<li><a href="#">Vector databases in generative AI applications</a></li>
+						<li><a href="#">What is Cosine Similarity: A Comprehensive Guide</a></li>
+						<li><a
+								href="https://www.llamaindex.ai/blog/introducing-the-property-graph-index-a-powerful-new-way-to-build-knowledge-graphs-with-llms">
+								Property Graph Index: A Powerful New Way to Build Knowledge Graphs with LLMs
+							</a>
+						</li>
+						<li><a
+								href="https://github.com/run-llama/llama_parse/blob/main/examples/knowledge_graphs/kg_agent.ipynb">
+								Example - Building Knowledge Graph Agent with LlamaParse</a></li>
+					</ul>
+					<hr>
+					<h2>Running Open-Source Inference Engines Locally</h2>
+					<p>Today, thanks to the strength and creativity of the open-source ecosystem, there are numerous
+						excellent options for running AI models and performing "generative inference" on your own
+						hardware.</p>
+					<p>Some of the most notable include <code>llama.cpp</code>, <code>vLLM</code>,
+						<code>llamafile</code>, <code>llm</code>, <code>gpt4all</code>, and the Hugging Face
+						transformers. One of my personal favorites is Ollama; it allows me to effortlessly run an LLM
+						with <code>ollama run</code> on the command line of my MacBook. Each of these tools, with their
+						unique approaches in the open-source AI space, offers a robust way for you to run open-source
+						large language models (like Meta's llama3, Mistral's mixtral model, etc.) locally on your own
+						hardware without needing a third-party API.
+					</p>
+					<p>Perhaps even more importantly, these software tools are well-optimized for running models on
+						consumer-grade hardware like personal laptops and gaming computers. You don't need a cluster of
+						enterprise-grade GPUs or an expensive third-party service to start experimenting with text
+						generation! You can get started today and begin building AI applications right from your laptop
+						using open-source technology with no third-party API.</p>
+					<p>This is precisely how I began transitioning our generative AI pipelines from OpenAI to a service
+						we run on top of Kubernetes for StarSearch: I started simply with Ollama running a Mistral model
+						locally on my laptop. Then, I began transitioning our OpenAI data pipelines that read from our
+						database and generate summaries to use my local Ollama server. Ollama, along with many other
+						inference engines available, offers an OpenAI-compatible API. This meant I didn't have to
+						rewrite much of the client code—simply replace the OpenAI API endpoint with the localhost
+						pointing to Ollama.</p>
+					<hr>
+					<h2>Selecting vLLM for Production</h2>
+					<span class="image main"><img src="images/lenovo/vector-gen-ollama.png" alt="" /></span>
+
+					<p>Eventually, I encountered a significant bottleneck using Ollama: it didn't support servicing
+						concurrent clients. Given the scale we're targeting, at any given time, we likely need several
+						dozen of our data pipeline microservice runners to batch process summaries and relationship
+						extractions from the generative
+						AI service simultaneously. This way, we could keep up with the constant load from over 3,000+
+						new product documentations with up to 150,000 pages daily. While OpenAI's API can handle this
+						kind of load, how could we replicate
+						this with our own service?</p>
+
+					<span class="image main"><img src="images/lenovo/vector-gen-vllm.png" alt="" /></span>
+
+					<p>Ultimately, I discovered vLLM, a fast inference runner that can service multiple clients behind
+						an OpenAI-compatible API and take advantage of multiple GPUs on a given computer with request
+						batching and efficient use of "PagedAttention" during inference. Similar to Ollama, the vLLM
+						community provides a container runtime image, which makes it very easy to use on various
+						production platforms. Excellent!</p>
+					<p><em>Note to the reader: Ollama has very recently merged changes to support concurrent clients. At
+							the time of this writing, it was not supported in the main upstream image, but I'm very
+							excited to see how it performs compared to other multi-client inference engines!</em></p>
+					<hr>
+					<h2>Running vLLM Locally</h2>
+					<p>To run vLLM locally, you'll need a Linux system and a Python runtime:</p>
+					<pre><code class="language-python">python -m vllm.entrypoints.openai.api_server \
+	--model mistralai/Mistral-7B-Instruct-v0.2
+
+					</code></pre>
+					<p>This command will start the OpenAI-compatible server, which you can then access locally on port
+						8000:</p>
+					<pre><code class="language-bash">curl http://localhost:8000/v1/models </code></pre>
+					<pre><code class="language-json">{
+	"object": "list",
+	"data": [
+		{
+			"id": "mistralai/Mistral-7B-Instruct-v0.2",
+			"object": "model",
+			"created": 1715528945,
+			"owned_by": "vllm",
+			"root": "mistralai/Mistral-7B-Instruct-v0.2",
+			"parent": null,
+			"permission": [
+				{
+					"id": "modelperm-020c373d027347aab5ffbb73cc20a688",
+					"object": "model_permission",
+					"created": 1715528945,
+					"allow_create_engine": false,
+					"allow_sampling": true,
+					"allow_logprobs": true,
+					"allow_search_indices": false,
+					"allow_view": true,
+					"allow_fine_tuning": false,
+					"organization": "*",
+					"group": null,
+					"is_blocking": false
+				}
+			]
+		}
+	]
+}</code></pre>
+
+					<p>Alternatively, to run a container with the OpenAI-compatible API, you can use Docker on your
+						Linux system:</p>
+					<pre><code class="language-bash">docker run --runtime nvidia --gpus all \
+	-v ~/.cache/huggingface:/root/.cache/huggingface \
+	-p 8000:8000 \
+	--ipc=host \
+	vllm/vllm-openai:latest \
+	--model mistralai/Mistral-7B-Instruct-v0.2</code></pre>
+					<p>This command will mount the local Hugging Face cache on your Linux machine and use the host
+						network. Then, using <code>localhost</code> again, we can access the OpenAI-compatible server
+						running in Docker. Let's perform a chat completion now:</p>
+					<pre><code class="language-bash">curl localhost:8000/v1/chat/completions \
+	-H "Content-Type: application/json" \
+	-d '{
+		"model": "TheBloke/Mistral-7B-Instruct-v0.2-AWQ",
+		"messages": [
+			{"role": "user", "content": "Who won the world series in 2020?"}
+		]
+	}' </code></pre>
+					<pre><code class="language-json"> {
+	"id": "cmpl-9f8b1a17ee814b5db6a58fdfae107977",
+	"object": "chat.completion",
+	"created": 1715529007,
+	"model": "mistralai/Mistral-7B-Instruct-v0.2",
+	"choices": [
+		{
+			"index": 0,
+			"message": {
+				"role": "assistant",
+				"content": "The Major League Baseball (MLB) World Series in 2020 was won by the Tampa Bay Rays. 
+				They defeated the Los Angeles Dodgers in six games to secure their first-ever World Series title. 
+				The series took place from October 20 to October 27, 2020, at Globe Life Field in Arlington, Texas."
+			},
+			"logprobs": null,
+			"finish_reason": "stop",
+			"stop_reason": null
+		}
+	],
+	"usage": {
+		"prompt_tokens": 21,
+		"total_tokens": 136,
+		"completion_tokens": 115
+	}
+}</code></pre>
+					<hr>
+					<h2>Utilizing Kubernetes for a Large-Scale vLLM Service</h2>
+					<p>Running vLLM locally is sufficient for testing, development, and experimentation with inference.
+						However, given the scale we're targeting, I realized we'd need an environment capable of easily
+						handling numerous compute instances with GPUs, scaling up with our needs, and load-balancing
+						vLLM behind a neutral service that our data pipeline microservices could access at production
+						rates. Enter Kubernetes—a familiar and popular container orchestration system!</p>
+					<p>In my opinion, this is an ideal use case for Kubernetes and would make scaling up an internal AI
+						service resembling OpenAI's API relatively seamless.</p>
+					<p>Ultimately, the architecture for this deployment looks like this:</p>
+					<ul>
+						<li>Deploy multiple Kubernetes nodes, each with any number of GPUs, into a node pool <ul>
+								<li>Install GPU drivers according to the managed Kubernetes service provider's
+									instructions. We're using Azure AKS, so they provide these instructions for
+									utilizing GPUs on the cluster.</li>
+							</ul>
+						</li>
+						<li>Deploy a DaemonSet for vLLM to run on each node with a GPU</li>
+						<li>Deploy a Kubernetes Service to load-balance internal requests to vLLM's OpenAI-compatible
+							API</li>
+					</ul>
+					<span class="image main"><img src="images/lenovo/kb-service.png" alt="" /></span>
+					<hr>
+					<h2>Preparing the Cluster</h2>
+					<p>If you're following along and aiming to replicate these results, I assume you already have a
+						Kubernetes cluster up and running, likely through a managed Kubernetes provider, and have
+						installed the necessary GPU drivers on the nodes that have GPUs.</p>
+					<p>On Azure's AKS, where we deployed this service, we needed to run a DaemonSet that installs the
+						Nvidia drivers for us on each of the nodes with a GPU:</p>
+					<pre><code class="language-yaml">apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+name: nvidia-device-plugin-daemonset
+namespace: gpu-resources
+spec:
+selector:
+matchLabels:
+	name: nvidia-device-plugin-ds
+template:
+metadata:
+	labels:
+	name: nvidia-device-plugin-ds
+spec:
+	containers:
+	- image: mcr.microsoft.com/oss/nvidia/k8s-device-plugin:v0.14.1
+	name: nvidia-device-plugin-ctr
+	securityContext:
+		capabilities:
+		drop:
+		- All
+	volumeMounts:
+	- mountPath: /var/lib/kubelet/device-plugins
+		name: device-plugin
+	nodeSelector:
+	accelerator: nvidia
+	tolerations:
+	- key: CriticalAddonsOnly
+	operator: Exists
+	- effect: NoSchedule
+	key: nvidia.com/gpu
+	operator: Exists
+	volumes:
+	- hostPath:
+		path: /var/lib/kubelet/device-plugins
+		type: ""
+	name: device-plugin</code></pre>
+					<p>This DaemonSet installs the Nvidia device plugin pod on each node labeled with
+						<code>accelerator: nvidia</code> and can tolerate certain taints from the system. Again, this is
+						somewhat platform-specific, but it enables our AKS cluster to have the necessary drivers for the
+						nodes with GPUs so vLLM can fully utilize those compute units.
+					</p>
+					<p>Eventually, we have a cluster node configuration that includes both default nodes and nodes with
+						GPUs:</p>
+					<pre><code class="language-bash">❯ kubectl get nodes -A
+NAME                 	STATUS   ROLES	AGE   VERSION
+defaultpool-88943984-0   Ready	<none>   5d	v1.29.2
+defaultpool-88943984-1   Ready	<none>   5d	v1.29.2
+gpupool-42074538-0   	Ready	<none>   41h   v1.29.2
+gpupool-42074538-1   	Ready	<none>   41h   v1.29.2
+gpupool-42074538-2   	Ready	<none>   41h   v1.29.2
+gpupool-42074538-3   	Ready	<none>   41h   v1.29.2
+gpupool-42074538-4   	Ready	<none>   41h   v1.29.2
+					</code></pre>
+					<p>Each of these nodes has a GPU device plugin pod managed by the DaemonSet where the drivers get
+						installed:</p>
+					<pre><code class="language-bash">❯ kubectl get daemonsets.apps -n gpu-resources
+NAME                             DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR        AGE
+nvidia-device-plugin-daemonset   5         5         5       5            5           accelerator=nvidia   41h
+					</code></pre>
+					<p>An important point for this setup: each of these GPU nodes has an
+						<code>accelerator: nvidia</code> label and taints for <code>nvidia.com/gpu</code>. This ensures
+						that no other pods are scheduled on these nodes since we anticipate vLLM consuming all the
+						compute and GPU resources on each of these nodes.
+					</p>
+					<hr>
+					<h2>Deploying a vLLM DaemonSet</h2>
+					<p>To fully utilize each of the GPUs deployed in the cluster, we can deploy an additional vLLM
+						DaemonSet that also selects each of the Nvidia GPU nodes:</p>
+					<pre><code class="language-yaml">
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: vllm-daemonset-ec9831c8
+  namespace: vllm-ns
+spec:
+  selector:
+    matchLabels:
+      app: vllm
+  template:
+    metadata:
+      labels:
+        app: vllm
+    spec:
+      containers:
+      - args:
+        - --model
+        - mistralai/Mistral-7B-Instruct-v0.2
+        - --gpu-memory-utilization
+        - "0.95"
+        - --enforce-eager
+        env:
+        - name: HUGGING_FACE_HUB_TOKEN
+          valueFrom:
+            secretKeyRef:
+              key: HUGGINGFACE_TOKEN
+              name: vllm-huggingface-token
+        image: vllm/vllm-openai:latest
+        name: vllm
+        ports:
+        - containerPort: 8000
+          protocol: TCP
+        resources:
+          limits:
+            nvidia.com/gpu: "1"
+      nodeSelector:
+        accelerator: nvidia
+      tolerations:
+      - effect: NoSchedule
+        key: nvidia.com/gpu
+        operator: Exists
+					</code></pre>
+					<p>Let's break down what's happening here:</p>
+					<p>First, we define the metadata and label selectors for the vLLM DaemonSet pods on the cluster. In
+						the container specification, we provide the arguments to the vLLM container running on the
+						cluster. You'll notice a few things: we're utilizing about 95% of GPU memory in this deployment
+						and enforcing CUDA eager mode (which helps with memory consumption at the expense of inference
+						performance). One aspect I appreciate about vLLM is its numerous options for tuning and running
+						on different hardware; there are many capabilities for tweaking how the inference works or how
+						your hardware is utilized. So check out the vLLM docs for further reading!</p>
+					<p>Next, you'll see we provide a Hugging Face token. This is so that vLLM can pull down the model
+						from Hugging Face's API and bypass any "gated" models that we've been granted permission to
+						access.</p>
+					<p>Then, we expose port 8000 for the pod. This will be used later in a Service to select these pods
+						and provide a neutral way to access a load-balanced endpoint for any of the various deployed
+						vLLM pods on port 8000. We specify a <code>nvidia.com/gpu</code> resource (which is provided as
+						a node-level resource by the Nvidia device plugin DaemonSet—again, depending on your managed
+						Kubernetes provider and how you installed the GPU drivers, this may vary). Finally, we include
+						the same node selector and taint tolerations to ensure that vLLM runs only on the GPU nodes!
+						Now, when we deploy this, we'll see the vLLM DaemonSet has successfully deployed onto each of
+						the GPU nodes:</p>
+					<pre><code class="language-bash">❯ kubectl get daemonsets.apps -n vllm-ns
+NAME                      DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR        AGE
+vllm-daemonset-ec9831c8   5         5         5       5            5           accelerator=nvidia   41h
+					</code></pre>
+					<hr>
+					<h2>Load Balancing with an Internal Kubernetes Service</h2>
+					<p>To provide an OpenAI-like API to other microservices internally on the cluster, we can apply a
+						Kubernetes Service that selects the vLLM pods in the <code>vllm-ns</code> namespace:</p>
+					<pre><code class="language-yaml">
+apiVersion: v1
+kind: Service
+metadata:
+  name: vllm-service
+  namespace: vllm-ns
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8000
+  selector:
+    app: vllm
+  sessionAffinity: None
+  type: ClusterIP
+					</code></pre>
+					<p>This simply selects pods labeled <code>app: vllm</code> and targets port 8000 of vLLM. This will
+						be picked up by the internal Kubernetes DNS server, and we can use the resolved
+						<code>vllm-service.vllm-ns</code> endpoint to load-balance requests to one of the vLLM APIs.
+					</p>
+					<hr>
+					<h2>Results</h2>
+					<p>Let's test this vLLM Kubernetes Service endpoint:</p>
+					<pre><code class="language-bash">
+						# hitting the vllm-service internal api endpoint resolved by Kubernetes DNS
+
+curl vllm-service.vllm-ns.svc.cluster.local/v1/chat \
+    -H "Content-Type: application/json" \
+    -d '{
+   	 "model": "mistralai/Mistral-7B-Instruct-v0.2",
+   	 "prompt": "Why is the sky blue?"
+}'
+					</code></pre>
+					<p>The <code>vllm-service.vllm-ns</code> internal Kubernetes service domain name resolves to one of
+						the nodes running a vLLM DaemonSet (again, load-balanced across all the running vLLM pods) and
+						will return an inference generation for the prompt "Why is the sky blue?":</p>
+					<pre><code class="language-json">{
+	"id": "cmpl-76cf74f9b05c4026aef7d64c06c681c4",
+	"object": "chat.completion",
+	"created": 1715533000,
+	"model": "mistralai/Mistral-7B-Instruct-v0.2",
+	"choices": [
+		{
+			"index": 0,
+			"message": {
+				"role": "assistant",
+				"content": "The color of the sky appears blue due to a natural phenomenon called Rayleigh scattering. 
+				As sunlight reaches Earth's atmosphere, it interacts with molecules and particles in the air, 
+				such as nitrogen and oxygen. 
+				These particles scatter short-wavelength light, like blue and violet light, more than longer wavelengths, 
+				like red, orange, and yellow. 
+				However, we perceive the sky as blue and not violet because our eyes are more sensitive to blue 
+				light and because sunlight reaches us more abundantly in the blue part of the spectrum.
+				\n\nAdditionally, some of the violet light gets absorbed by the ozone layer in the stratosphere, 
+				which prevents us from seeing a violet sky. At sunrise and sunset, the sky can take on hues of red, orange, 
+				and pink due to the scattering of sunlight through the Earth's atmosphere at those angles."
+			},
+			"logprobs": null,
+			"finish_reason": "stop",
+			"stop_reason": null
+		}
+	],
+	"usage": {
+		"prompt_tokens": 15,
+		"total_tokens": 201,
+		"completion_tokens": 186
+	}
+}</code></pre>
+					<hr>
+					<h2>Conclusion</h2>
+					<p>In summary, this approach allows our internal microservices running on the cluster to generate
+						summaries and extract entities' relationships without relying on an expensive third-party API.
+						We've achieved excellent results using the Mistral models, and for our use case at this scale,
+						running the service on our own GPUs has been significantly more economical.</p>
+					<p>You can build upon this by adding networking policies or configurations to your internal service,
+						or even integrating an ingress controller to offer this as a service to others outside your
+						cluster. The possibilities are endless from here! Wishing you success in your endeavors!</p>
+				</section>
+
+			</div>
+		</div>
+
+		<!-- Sidebar -->
+		<div id="sidebar">
+			<div class="inner">
+
+				<!-- Search -->
+				<section id="search" class="alt">
+					<form method="post" action="#">
+						<input type="text" name="query" id="query" placeholder="Search" />
+					</form>
+				</section>
+
+				<!-- Menu -->
+				<nav id="menu">
+					<header class="major">
+						<h2>Menu</h2>
+					</header>
+					<ul>
+						<li><a href="index.html">Homepage</a></li>
+						<li><a href="certificates.html">Certificates</a></li>
+						<!-- <li><a href="generic.html">Generic</a></li>
+									<li><a href="elements.html">Elements</a></li>
+									<li>
+										<span class="opener">Submenu</span>
+										<ul>
+											<li><a href="#">Lorem Dolor</a></li>
+											<li><a href="#">Ipsum Adipiscing</a></li>
+											<li><a href="#">Tempus Magna</a></li>
+											<li><a href="#">Feugiat Veroeros</a></li>
+										</ul>
+									</li>
+									<li><a href="#">Etiam Dolore</a></li>
+									<li><a href="#">Adipiscing</a></li>
+									<li>
+										<span class="opener">Another Submenu</span>
+										<ul>
+											<li><a href="#">Lorem Dolor</a></li>
+											<li><a href="#">Ipsum Adipiscing</a></li>
+											<li><a href="#">Tempus Magna</a></li>
+											<li><a href="#">Feugiat Veroeros</a></li>
+										</ul>
+									</li>
+									<li><a href="#">Maximus Erat</a></li>
+									<li><a href="#">Sapien Mauris</a></li>
+									<li><a href="#">Amet Lacinia</a></li> -->
+					</ul>
+				</nav>
+
+				<!-- Section -->
+				<section>
+					<header class="major">
+						<h2>Recent blogs</h2>
+					</header>
+					<div class="mini-posts">
+						<article>
+							<a href="lenovo-vllm-deploy.html" class="image"><img
+									src="images/lenovo/coverpage-simplified.png" alt="" /></a>
+							<p>Discover how to scale generative AI applications cost-effectively by deploying
+								open-source models with vLLM on Kubernetes, enabling high-volume data processing without
+								relying on expensive third-party APIs.</p>
+						</article>
+						<article>
+							<a href="rio-tinto.html" class="image"><img
+									src="images/rio-tinto/mining-event-tracker-thumbnails.png" alt="" /></a>
+							<p>Uses AI to analyze online press releases, to track mining-related surveys and their
+								completion timelines, to help Rio Tinto better invest.</p>
+						</article>
+						<article>
+							<a href="mini-gpt.html" class="image"><img src="images/mini-gpt/coverpage.png" alt="" /></a>
+							<p>Train your own large language models (LLMs) to generate industry-specific responses,
+								using reinforcement learning and memory optimization techniques.</p>
+						</article>
+						<article>
+							<a href="msnews-ar.html" class="image"><img src="images/msnews-ar/overview.jpg"
+									alt="" /></a>
+							<p>Winning Project of nwHacks - classifying images using AI, discovering related digital
+								contents, and rendering them in AR.</p>
+						</article>
+					</div>
+					<ul class="actions">
+						<li><a href="#" class="button">More</a></li>
+					</ul>
+				</section>
+
+				<!-- Section -->
+				<section>
+					<header class="major">
+						<h2>Get in touch</h2>
+					</header>
+					<p>If you are interested in learning more about my work, feel free to get in touch.</p>
+					<ul class="contact">
+						<li class="icon solid fa-envelope"><a href="#">zhangzhipian1@gmail.com</a></li>
+						<li class="icon solid fa-phone">(604) 720-2269</li>
+						<!-- <li class="icon solid fa-home">1234 Somewhere Road #8254<br />
+									Nashville, TN 00000-0000</li> -->
+					</ul>
+				</section>
+
+				<!-- Footer -->
+				<footer id="footer">
+					<p class="copyright">&copy; Alex (Zhipian) Zhang. All rights reserved.</p>
+				</footer>
+
+			</div>
+		</div>
+
+	</div>
+
+	<!-- Scripts -->
+	<script src="assets/js/jquery.min.js"></script>
+	<script src="assets/js/browser.min.js"></script>
+	<script src="assets/js/breakpoints.min.js"></script>
+	<script src="assets/js/util.js"></script>
+	<script src="assets/js/main.js"></script>
+	<!-- Include Prism.js JS -->
+	<script src="assets/js/prism.js"></script>
+</body>
+
+</html>
