@@ -208,7 +208,7 @@
 					<h2>Running vLLM Locally</h2>
 					<p>To run vLLM locally, you'll need a Linux system and a Python runtime:</p>
 					<pre><code class="language-python">python -m vllm.entrypoints.openai.api_server \
-	--model mistralai/Mistral-7B-Instruct-v0.2
+    --model meta-llama/Llama-2-7b-chat-hf
 
 					</code></pre>
 					<p>This command will start the OpenAI-compatible server, which you can then access locally on port
@@ -218,17 +218,17 @@
 	"object": "list",
 	"data": [
 		{
-			"id": "mistralai/Mistral-7B-Instruct-v0.2",
+			"id": "meta-llama/Llama-2-7b-chat-hf",
 			"object": "model",
-			"created": 1715528945,
+			"created": 1715529000,
 			"owned_by": "vllm",
-			"root": "mistralai/Mistral-7B-Instruct-v0.2",
+			"root": "meta-llama/Llama-2-7b-chat-hf",
 			"parent": null,
 			"permission": [
 				{
-					"id": "modelperm-020c373d027347aab5ffbb73cc20a688",
+					"id": "modelperm-0abc373d1234567890ffbb73cc20a678",
 					"object": "model_permission",
-					"created": 1715528945,
+					"created": 1715529000,
 					"allow_create_engine": false,
 					"allow_sampling": true,
 					"allow_logprobs": true,
@@ -247,35 +247,33 @@
 					<p>Alternatively, to run a container with the OpenAI-compatible API, you can use Docker on your
 						Linux system:</p>
 					<pre><code class="language-bash">docker run --runtime nvidia --gpus all \
-	-v ~/.cache/huggingface:/root/.cache/huggingface \
-	-p 8000:8000 \
-	--ipc=host \
-	vllm/vllm-openai:latest \
-	--model mistralai/Mistral-7B-Instruct-v0.2</code></pre>
+    -v ~/.cache/huggingface:/root/.cache/huggingface \
+    -p 8000:8000 \
+    --ipc=host \
+    vllm/vllm-openai:latest \
+    --model meta-llama/Llama-2-7b-chat-hf</code></pre>
 					<p>This command will mount the local Hugging Face cache on your Linux machine and use the host
 						network. Then, using <code>localhost</code> again, we can access the OpenAI-compatible server
 						running in Docker. Let's perform a chat completion now:</p>
 					<pre><code class="language-bash">curl localhost:8000/v1/chat/completions \
-	-H "Content-Type: application/json" \
-	-d '{
-		"model": "TheBloke/Mistral-7B-Instruct-v0.2-AWQ",
-		"messages": [
-			{"role": "user", "content": "Who won the world series in 2020?"}
-		]
-	}' </code></pre>
+    -H "Content-Type: application/json" \
+    -d '{
+        "model": "meta-llama/Llama-2-7b-chat-hf",
+        "messages": [
+            {"role": "user", "content": "What is the capital of France?"}
+        ]
+    }' </code></pre>
 					<pre><code class="language-json"> {
-	"id": "cmpl-9f8b1a17ee814b5db6a58fdfae107977",
+	"id": "cmpl-5e7c1a28de924b4b8c58f8e5ab109877",
 	"object": "chat.completion",
-	"created": 1715529007,
-	"model": "mistralai/Mistral-7B-Instruct-v0.2",
+	"created": 1715530000,
+	"model": "meta-llama/Llama-2-7b-chat-hf",
 	"choices": [
 		{
 			"index": 0,
 			"message": {
 				"role": "assistant",
-				"content": "The Major League Baseball (MLB) World Series in 2020 was won by the Tampa Bay Rays. 
-				They defeated the Los Angeles Dodgers in six games to secure their first-ever World Series title. 
-				The series took place from October 20 to October 27, 2020, at Globe Life Field in Arlington, Texas."
+				"content": "The capital of France is Paris. It is a major European city known for its culture, art, fashion, and history."
 			},
 			"logprobs": null,
 			"finish_reason": "stop",
@@ -283,9 +281,9 @@
 		}
 	],
 	"usage": {
-		"prompt_tokens": 21,
-		"total_tokens": 136,
-		"completion_tokens": 115
+		"prompt_tokens": 16,
+		"total_tokens": 98,
+		"completion_tokens": 82
 	}
 }</code></pre>
 					<hr>
@@ -362,20 +360,20 @@ spec:
 					<p>Eventually, we have a cluster node configuration that includes both default nodes and nodes with
 						GPUs:</p>
 					<pre><code class="language-bash">❯ kubectl get nodes -A
-NAME                 	STATUS   ROLES	AGE   VERSION
-defaultpool-88943984-0   Ready	<none>   5d	v1.29.2
-defaultpool-88943984-1   Ready	<none>   5d	v1.29.2
-gpupool-42074538-0   	Ready	<none>   41h   v1.29.2
-gpupool-42074538-1   	Ready	<none>   41h   v1.29.2
-gpupool-42074538-2   	Ready	<none>   41h   v1.29.2
-gpupool-42074538-3   	Ready	<none>   41h   v1.29.2
-gpupool-42074538-4   	Ready	<none>   41h   v1.29.2
+NAME                  	STATUS   ROLES	AGE   VERSION
+mynodepool-74185296-0    Ready    <none>   4d    v1.28.1
+mynodepool-74185296-1    Ready    <none>   4d    v1.28.1
+mygpupool-96325874-0     Ready    <none>   30h   v1.28.1
+mygpupool-96325874-1     Ready    <none>   30h   v1.28.1
+mygpupool-96325874-2     Ready    <none>   30h   v1.28.1
+mygpupool-96325874-3     Ready    <none>   30h   v1.28.1
+mygpupool-96325874-4     Ready    <none>   30h   v1.28.1
 					</code></pre>
 					<p>Each of these nodes has a GPU device plugin pod managed by the DaemonSet where the drivers get
 						installed:</p>
 					<pre><code class="language-bash">❯ kubectl get daemonsets.apps -n gpu-resources
 NAME                             DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR        AGE
-nvidia-device-plugin-daemonset   5         5         5       5            5           accelerator=nvidia   41h
+nvidia-device-plugin-daemonset   5         5         5       5            5           accelerator=nvidia   35h
 					</code></pre>
 					<p>An important point for this setup: each of these GPU nodes has an
 						<code>accelerator: nvidia</code> label and taints for <code>nvidia.com/gpu</code>. This ensures
@@ -390,7 +388,7 @@ nvidia-device-plugin-daemonset   5         5         5       5            5     
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: vllm-daemonset-ec9831c8
+  name: vllm-daemonset-ec3513d4
   namespace: vllm-ns
 spec:
   selector:
@@ -450,7 +448,7 @@ spec:
 						the GPU nodes:</p>
 					<pre><code class="language-bash">❯ kubectl get daemonsets.apps -n vllm-ns
 NAME                      DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR        AGE
-vllm-daemonset-ec9831c8   5         5         5       5            5           accelerator=nvidia   41h
+vllm-daemonset-ec3513d4   5         5         5       5            5           accelerator=nvidia   35h
 					</code></pre>
 					<hr>
 					<h2>Load Balancing with an Internal Kubernetes Service</h2>
@@ -485,33 +483,32 @@ spec:
 curl vllm-service.vllm-ns.svc.cluster.local/v1/chat \
     -H "Content-Type: application/json" \
     -d '{
-   	 "model": "mistralai/Mistral-7B-Instruct-v0.2",
-   	 "prompt": "Why is the sky blue?"
+   	 "model": "meta-llama/Llama-2-7b-chat-hf",
+   	 "prompt": "How does photosynthesis work?"
 }'
 					</code></pre>
 					<p>The <code>vllm-service.vllm-ns</code> internal Kubernetes service domain name resolves to one of
 						the nodes running a vLLM DaemonSet (again, load-balanced across all the running vLLM pods) and
-						will return an inference generation for the prompt "Why is the sky blue?":</p>
+						will return an inference generation for the prompt "How does photosynthesis work?":</p>
 					<pre><code class="language-json">{
-	"id": "cmpl-76cf74f9b05c4026aef7d64c06c681c4",
+	"id": "cmpl-abc123def4567890ghi123jkl456mno7",
 	"object": "chat.completion",
-	"created": 1715533000,
-	"model": "mistralai/Mistral-7B-Instruct-v0.2",
+	"created": 1715535000,
+	"model": "meta-llama/Llama-2-7b-chat-hf",
 	"choices": [
 		{
 			"index": 0,
 			"message": {
 				"role": "assistant",
-				"content": "The color of the sky appears blue due to a natural phenomenon called Rayleigh scattering. 
-				As sunlight reaches Earth's atmosphere, it interacts with molecules and particles in the air, 
-				such as nitrogen and oxygen. 
-				These particles scatter short-wavelength light, like blue and violet light, more than longer wavelengths, 
-				like red, orange, and yellow. 
-				However, we perceive the sky as blue and not violet because our eyes are more sensitive to blue 
-				light and because sunlight reaches us more abundantly in the blue part of the spectrum.
-				\n\nAdditionally, some of the violet light gets absorbed by the ozone layer in the stratosphere, 
-				which prevents us from seeing a violet sky. At sunrise and sunset, the sky can take on hues of red, orange, 
-				and pink due to the scattering of sunlight through the Earth's atmosphere at those angles."
+				"content": "Photosynthesis is the process by which plants, algae, and certain bacteria convert light energy, 
+				typically from the sun, into chemical energy in the form of glucose. This process occurs primarily in the 
+				leaves of plants, within specialized organelles called chloroplasts. The key ingredients for photosynthesis 
+				are sunlight, carbon dioxide (CO2) from the atmosphere, and water (H2O) from the soil.\n\n
+				Through a series of reactions known as the light-dependent and light-independent reactions (Calvin cycle), 
+				chlorophyll pigments absorb sunlight, splitting water molecules into oxygen (O2) and hydrogen ions (H+), 
+				and generating energy-rich molecules like ATP and NADPH. These energy carriers are then used in the Calvin 
+				cycle to fix carbon dioxide into glucose, a form of sugar that the plant can store or use for energy.\n\n
+				Photosynthesis is vital for life on Earth as it not only produces oxygen but also forms the base of most food chains."
 			},
 			"logprobs": null,
 			"finish_reason": "stop",
@@ -519,9 +516,9 @@ curl vllm-service.vllm-ns.svc.cluster.local/v1/chat \
 		}
 	],
 	"usage": {
-		"prompt_tokens": 15,
-		"total_tokens": 201,
-		"completion_tokens": 186
+		"prompt_tokens": 12,
+		"total_tokens": 220,
+		"completion_tokens": 208
 	}
 }</code></pre>
 					<hr>
