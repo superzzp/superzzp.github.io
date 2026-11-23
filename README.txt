@@ -1,30 +1,32 @@
-Editorial by HTML5 UP
-html5up.net | @ajlkn
-Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+HOMEPAGE AND HEADER UPDATE — LINKEDIN
 
+Install the updated files
+1. Copy all included HTML files into your website root, replacing the matching files.
+2. Copy assets/css/home.css into your existing assets/css folder.
+   Merge folders; do not replace the entire assets folder.
+3. Publish through your normal GitHub Pages workflow when ready.
 
-Say hello to Editorial, a blog/magazine-ish template built around a toggleable "locking"
-sidebar (scroll down to see what I mean) and an accordion-style menu. Not the usual landing
-page/portfolio affair you'd expect to see at HTML5 UP, but I figured for my 41st (!!!)
-template I'd change it up a little. Enjoy :)
+Changes in this revision
+- Replaced the upper-right social icon row with a single LinkedIn icon on all eight HTML pages.
+- The icon links to https://www.linkedin.com/in/alexcs/ and opens in a new tab.
+- Uses the LinkedIn brand icon already bundled with your site's Font Awesome files; no new image or external dependency is needed.
+- Includes an accessible label and a LinkedIn hover tooltip.
+- Only each page's header icon list changed. All project content, images, results, navigation, and styles are preserved.
 
-Demo images* courtesy of Unsplash, a radtastic collection of CC0 (public domain) images
-you can use for pretty much whatever.
+Updated HTML files
+- certificates.html
+- elements.html
+- generic_1.html
+- index.html
+- lenovo-vllm-deploy.html
+- mini-gpt.html
+- msnews-ar.html
+- rio-tinto.html
 
-(* = not included)
+Previous homepage improvements included
+- A centered main container capped at 80rem (1280px with default browser settings), including existing padding.
+- The approved mobile/tablet portrait crop and capped desktop photo size.
+- Aligned blog More buttons, consistent thumbnail frames, and improved tablet gutters.
+- Working Learn More and email links, mobile zoom, accessible labels, and keyboard focus indicators.
 
-AJ
-aj@lkn.io | @ajlkn
-
-
-Credits:
-
-	Demo Images:
-		Unsplash (unsplash.com)
-
-	Icons:
-		Font Awesome (fontawesome.io)
-
-	Other:
-		jQuery (jquery.com)
-		Responsive Tools (github.com/ajlkn/responsive-tools)
+The included home.css is unchanged from the preceding desktop-width revision. The stylesheet URL remains home.css?v=3.

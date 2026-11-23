@@ -1,181 +1,208 @@
 <!DOCTYPE HTML>
-<!--
-	Editorial by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
--->
-<html>
-
+<!-- Editorial by HTML5 UP | html5up.net | CCA 3.0. Original portfolio shell retained. -->
+<html lang="en" class="mini-gpt-page">
 <head>
-	<title>Blog - Fine-tuning Large Language Models with RLHF and LoRA</title>
-	<meta charset="utf-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-	<link rel="stylesheet" href="assets/css/main.css" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mini-GPT: LoRA &amp; RLHF Fine-Tuning | Alex Zhang</title>
+  <meta name="description" content="A hands-on LLM fine-tuning project exploring LoRA, PPO, and memory-efficient training for movie-review generation and programming Q&amp;A. Original experiments, outputs, and lessons by Alex Zhang and team.">
+  <meta property="og:title" content="Mini-GPT: fine-tuning with LoRA and RLHF | Alex Zhang">
+  <meta property="og:description" content="From pretrained models to task-specific generation: explore the training workflow, original outputs, and experimental results.">
+  <meta property="og:image" content="https://superzzp.github.io/images/mini-gpt/coverpage.png">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://superzzp.github.io/mini-gpt.html">
+  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="stylesheet" href="assets/css/project-pages.css?v=20261116-evidence">
+  <link rel="stylesheet" href="assets/css/mini-gpt.css?v=20261122">
+  <script>if(location.hostname==='superzzp.github.io'){window.dataLayer=window.dataLayer||[];window.gtag=function(){dataLayer.push(arguments)};gtag('js',new Date());gtag('config','G-Q6M5ZH96CD');const g=document.createElement('script');g.async=true;g.src='https://www.googletagmanager.com/gtag/js?id=G-Q6M5ZH96CD';document.head.appendChild(g)}</script>
 </head>
+<body class="is-preload project-page" data-project="mini-gpt">
+<a class="skip" href="#project">Skip to project content</a>
+<div id="wrapper"><main id="main"><div class="inner">
+<header id="header"><a href="index.html" class="logo"><strong>Blog Post</strong> by Alex (Zhipian) Zhang</a><ul class="icons"><li><a href="https://www.linkedin.com/in/alexcs/" class="icon brands fa-linkedin-in" target="_blank" rel="noopener noreferrer" aria-label="Alex Zhang on LinkedIn (opens in a new tab)" title="LinkedIn"><span class="label">LinkedIn</span></a></li></ul></header>
+<article class="project-article" id="project">
+  <header class="project-intro">
+    <p class="eyebrow">Mini-GPT · LLM fine-tuning · Project case study</p>
+    <h1>Fine-tuning with<br>LoRA &amp; RLHF</h1>
+    <p class="project-subtitle">Teaching language models to generate movie reviews and answer programming questions, with GPU memory as a design constraint.</p>
+    <div class="project-meta"><span>Alex (Zhipian) Zhang</span><span>Team: GPT-is-all-we-need</span></div>
+  </header>
+  <figure class="project-cover">
+    <img src="images/mini-gpt/coverpage.png" width="936" height="526" fetchpriority="high" alt="Original Mini-GPT project artwork: Fine-tuning Large Language Models with Reinforcement Learning and Memory Optimization.">
+    <figcaption>The original project: parameter-efficient adaptation, sentiment control, and memory optimization.</figcaption>
+  </figure>
+  <div class="metrics" aria-label="Project at a glance">
+    <div class="metric"><strong>20K</strong><span>IMDb reviews in<br>the project dataset</span></div>
+    <div class="metric"><strong>20B</strong><span>Parameters in the largest<br>model explored</span></div>
+    <div class="metric"><strong>24 GB</strong><span>GPU memory budget<br>for the experiments</span></div>
+    <div class="metric"><strong>2 tasks</strong><span>Movie reviews and<br>programming Q&amp;A</span></div>
+  </div>
+  <nav class="project-toc" aria-label="On this page">
+    <strong>Explore this project</strong>
+    <a href="#overview">Overview</a><a href="#training">Training workflow</a><a href="#memory">Memory optimization</a><a href="#results">Results &amp; outputs</a><a href="#takeaways">What I learned</a>
+  </nav>
 
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-Q6M5ZH96CD"></script>
-<script>
-	window.dataLayer = window.dataLayer || [];
-	function gtag() { dataLayer.push(arguments); }
-	gtag('js', new Date());
+  <section id="overview">
+    <p class="eyebrow">The challenge</p>
+    <h2>Adapt the behaviour. Work within the hardware.</h2>
+    <p class="intro-text">Our team explored how far we could adapt open language models with limited GPU memory. We combined low-rank adaptation (LoRA) with reinforcement learning from human feedback (RLHF), using movie-review sentiment as a concrete training objective.</p>
+    <div class="mg-task-grid">
+      <div class="mg-task">
+        <span class="mg-task-icon icon solid fa-film" aria-hidden="true"></span>
+        <h3>Generate movie reviews</h3>
+        <p>Adapt GPT-NeoX and Pythia models to IMDb text, then use a sentiment reward model and proximal policy optimization (PPO) to encourage more positive continuations.</p>
+        <span class="mg-task-status">Fine-tuning + PPO experiments</span>
+      </div>
+      <div class="mg-task">
+        <span class="mg-task-icon icon solid fa-code" aria-hidden="true"></span>
+        <h3>Answer programming questions</h3>
+        <p>Explore LLaMA and Vicuna for Stack Overflow Q&amp;A. Evaluate task adaptation while investigating how to reward answer quality beyond surface-level language.</p>
+        <span class="mg-task-status">Fine-tuning + reward-model exploration</span>
+      </div>
+    </div>
+    <div class="pillrow" aria-label="Technologies used"><span class="pill">PyTorch</span><span class="pill">Hugging Face</span><span class="pill">LoRA / PEFT</span><span class="pill">PPO</span><span class="pill">8-bit loading</span><span class="pill">Weights &amp; Biases</span></div>
+  </section>
 
-	gtag('config', 'G-Q6M5ZH96CD');
-</script>
+  <section id="training">
+    <p class="eyebrow">The approach</p>
+    <h2>From pretrained weights to task-specific generation.</h2>
+    <p>The movie-review workflow separates learning the writing task from optimizing its sentiment. Each stage has a different purpose.</p>
+    <ol class="mg-training-flow">
+      <li><span class="mg-stage-label">Adapt</span><h3>Fine-tune with LoRA</h3><p>Load the base model in 8-bit precision, freeze its pretrained weights, and train small adapter matrices on review text.</p><span class="mg-stage-output">Task-adapted language model</span></li>
+      <li><span class="mg-stage-label">Evaluate</span><h3>Score generated reviews</h3><p>Generate continuations from review prompts. A sentiment model assigns the reward used to guide the next training stage.</p><span class="mg-stage-output">Reward for each continuation</span></li>
+      <li><span class="mg-stage-label">Optimize</span><h3>Refine with PPO</h3><p>Update the active model toward higher rewards. In reference-model runs, a KL penalty limits drift from the starting policy.</p><span class="mg-stage-output">More positive review generation</span></li>
+    </ol>
+    <details class="mg-details"><summary>Explore the original training diagrams</summary><div class="detail-body">
+      <figure class="mg-figure ">
+      <a class="mg-figure-link" href="images/mini-gpt/workflows1.png" data-enlarge aria-label="Enlarge: LoRA workflow: frozen base-model weights, trainable adapters, and merging adapter weights.">
+        <img src="images/mini-gpt/workflows1.png" alt="LoRA workflow: frozen base-model weights, trainable adapters, and merging adapter weights." width="2078" height="1126" loading="lazy" decoding="async">
+        <span class="mg-enlarge" aria-hidden="true">Enlarge figure <span>+</span></span>
+      </a><figcaption>Original workflow: adapt the pretrained model with LoRA, then merge the learned adapters.</figcaption></figure>
+      <figure class="mg-figure ">
+      <a class="mg-figure-link" href="images/mini-gpt/workflows2.png" data-enlarge aria-label="Enlarge: PPO workflow with an active model, reference model, sentiment reward, and KL-divergence penalty.">
+        <img src="images/mini-gpt/workflows2.png" alt="PPO workflow with an active model, reference model, sentiment reward, and KL-divergence penalty." width="1924" height="960" loading="lazy" decoding="async">
+        <span class="mg-enlarge" aria-hidden="true">Enlarge figure <span>+</span></span>
+      </a><figcaption>Original PPO diagram showing generation, reward evaluation, and the reference-model training loop.</figcaption></figure>
+    </div></details>
+    <details class="mg-details"><summary>Explore the datasets, models, and training logs</summary><div class="detail-body">
+      <p>We explored GPT-NeoX-20B and Pythia variants from 70M to 12B for movie reviews, alongside LLaMA / Vicuna for programming Q&amp;A. Training configurations differed across experiments.</p>
+      <figure class="mg-figure ">
+      <a class="mg-figure-link" href="images/mini-gpt/dataset-models.png" data-enlarge aria-label="Enlarge: IMDb and Stack Overflow datasets, GPT-NeoX and Pythia variants, and LLaMA-7B.">
+        <img src="images/mini-gpt/dataset-models.png" alt="IMDb and Stack Overflow datasets, GPT-NeoX and Pythia variants, and LLaMA-7B." width="2452" height="1186" loading="lazy" decoding="async">
+        <span class="mg-enlarge" aria-hidden="true">Enlarge figure <span>+</span></span>
+      </a><figcaption>Models and datasets explored in the original project.</figcaption></figure>
+      <figure class="mg-figure ">
+      <a class="mg-figure-link" href="images/mini-gpt/wandb-gptneox-20b-imdb-lora.png" data-enlarge aria-label="Enlarge: Weights and Biases training logs for GPT-NeoX-20B LoRA fine-tuning on IMDb.">
+        <img src="images/mini-gpt/wandb-gptneox-20b-imdb-lora.png" alt="Weights and Biases training logs for GPT-NeoX-20B LoRA fine-tuning on IMDb." width="2134" height="1750" loading="lazy" decoding="async">
+        <span class="mg-enlarge" aria-hidden="true">Enlarge figure <span>+</span></span>
+      </a><figcaption>Recorded training logs for the GPT-NeoX-20B IMDb fine-tuning run.</figcaption></figure>
+    </div></details>
+  </section>
 
+  <section id="memory">
+    <p class="eyebrow">The engineering constraint</p>
+    <h2>Make limited GPU memory go further.</h2>
+    <div class="mg-memory-layout">
+      <div class="mg-memory-budget"><span class="mg-overline">Working budget</span><strong>24<span>GB</span></strong><p>Memory shaped the model choice, training configuration, and reinforcement-learning setup.</p><span class="mg-budget-caption">A constraint across the experiments</span></div>
+      <dl class="mg-memory-methods">
+        <div><dt>8-bit model loading</dt><dd>Reduce the memory needed to store pretrained weights.</dd></div>
+        <div><dt>Low-rank adapters</dt><dd>Train a small set of additional parameters while keeping the base model frozen.</dd></div>
+        <div><dt>Mixed precision &amp; gradient accumulation</dt><dd>Use smaller numerical formats and build an effective batch over several smaller steps.</dd></div>
+        <div><dt>Gradient checkpointing</dt><dd>Recompute intermediate activations during backpropagation to reduce stored activations.</dd></div>
+      </dl>
+    </div>
+    <p class="mg-context-note">The project explored both reference-model and no-reference PPO configurations. Their memory use and reward scores should be read together with the setup, rather than treated as directly equivalent runs.</p>
+    <details class="mg-details"><summary>View the original hardware and model-size challenges</summary><div class="detail-body"><figure class="mg-figure ">
+      <a class="mg-figure-link" href="images/mini-gpt/challenges.png" data-enlarge aria-label="Enlarge: Original project slide describing model quality and GPU memory constraints.">
+        <img src="images/mini-gpt/challenges.png" alt="Original project slide describing model quality and GPU memory constraints." width="2266" height="1224" loading="lazy" decoding="async">
+        <span class="mg-enlarge" aria-hidden="true">Enlarge figure <span>+</span></span>
+      </a><figcaption>The original project constraints that shaped the training setup.</figcaption></figure></div></details>
+  </section>
 
-<body class="is-preload">
+  <section id="results">
+    <p class="eyebrow">The evidence</p>
+    <h2>See what changed after training.</h2>
+    <p>Explore the recorded outputs and results from the two project tracks.</p>
+    <div class="mg-results" data-tabs>
+      <div class="mg-tab-list" role="tablist" aria-label="Experiment results" hidden>
+        <button type="button" role="tab" id="tab-reviews" aria-controls="panel-reviews" aria-selected="true">Movie reviews</button>
+        <button type="button" role="tab" id="tab-qa" aria-controls="panel-qa" aria-selected="false" tabindex="-1">Programming Q&amp;A</button>
+      </div>
+      <div id="panel-reviews" class="mg-panel" role="tabpanel" aria-labelledby="tab-reviews" tabindex="0">
+        <div class="mg-result-heading"><div><span class="mg-overline">GPT-NeoX-20B · LoRA + PPO</span><h3>A measurable shift in review sentiment.</h3></div><span class="mg-sample-count">64 evaluation samples</span></div>
+        <div class="mg-reward-chart" role="img" aria-label="Median sentiment reward increased from 0.266849 before training to 2.518130 after training. These are reward scores, not accuracy percentages.">
+          <div class="mg-reward-row"><span>Before training</span><div class="mg-bar-track"><span class="mg-bar mg-bar-before" style="--bar: 10.6%"></span></div><strong>0.267</strong></div>
+          <div class="mg-reward-row"><span>After training</span><div class="mg-bar-track"><span class="mg-bar" style="--bar: 100%"></span></div><strong>2.518</strong></div>
+          <p>Median sentiment reward · values from the original results</p>
+        </div>
+        <div class="mg-samples">
+          <div class="mg-sample-heading"><h3>Compare the generated text</h3><p>Recorded excerpts from the original experiment.</p></div>
+          <div class="mg-sample-controls" aria-label="Choose a recorded prompt" hidden>
+            <button type="button" data-sample="0" aria-pressed="true">I chose to see</button><button type="button" data-sample="1" aria-pressed="false">My 3rd-</button><button type="button" data-sample="2" aria-pressed="false">How a director of</button>
+          </div>
+          <div class="mg-sample-output" aria-live="polite" aria-atomic="true">
+            <p class="mg-prompt">Prompt <strong id="mg-prompt">I chose to see</strong></p>
+            <div class="mg-comparison">
+              <div class="mg-before"><span class="mg-output-label">Before RLHF</span><blockquote id="mg-before">I chose to see this movie nearly alone, which is a</blockquote><p class="mg-score">Sentiment reward <strong id="mg-before-score">−1.165</strong></p></div>
+              <div class="mg-after"><span class="mg-output-label">After RLHF</span><blockquote id="mg-after">I chose to see this movie which is a celebration of</blockquote><p class="mg-score">Sentiment reward <strong id="mg-after-score">1.515</strong></p></div>
+            </div>
+          </div>
+          <p class="mg-result-note">The excerpts show a shift toward positive language. Reward scores measure the sentiment objective, not factual accuracy or overall writing quality.</p>
+        </div>
+        <details class="mg-details"><summary>View the original GPT-NeoX results and generated outputs</summary><div class="detail-body"><figure class="mg-figure ">
+      <a class="mg-figure-link" href="images/mini-gpt/results-neox.png" data-enlarge aria-label="Enlarge: GPT-NeoX-20B median reward before training 0.266849 and after training 2.518130, with PPO logs.">
+        <img src="images/mini-gpt/results-neox.png" alt="GPT-NeoX-20B median reward before training 0.266849 and after training 2.518130, with PPO logs." width="2160" height="1332" loading="lazy" decoding="async">
+        <span class="mg-enlarge" aria-hidden="true">Enlarge figure <span>+</span></span>
+      </a><figcaption>Original GPT-NeoX results: median sentiment rewards, sample generations, and training logs.</figcaption></figure><figure class="mg-figure ">
+      <a class="mg-figure-link" href="images/mini-gpt/Inference-PPO-GPT-NeoX-samples.png" data-enlarge aria-label="Enlarge: Three recorded GPT-NeoX review continuations before and after RLHF, with sentiment rewards.">
+        <img src="images/mini-gpt/Inference-PPO-GPT-NeoX-samples.png" alt="Three recorded GPT-NeoX review continuations before and after RLHF, with sentiment rewards." width="2398" height="1226" loading="lazy" decoding="async">
+        <span class="mg-enlarge" aria-hidden="true">Enlarge figure <span>+</span></span>
+      </a><figcaption>Original generation excerpts used in the comparison above.</figcaption></figure></div></details>
+        <details class="mg-details"><summary>Compare the Pythia model-size experiments</summary><div class="detail-body">
+          <p>Smaller models did not respond equally well to the reward signal. The 70M run failed, and the 160M run showed little improvement. Larger configurations demonstrated stronger sentiment steering, with different memory requirements and reference-model choices.</p>
+          <figure class="mg-figure ">
+      <a class="mg-figure-link" href="images/mini-gpt/results-pythia-small-mdl.png" data-enlarge aria-label="Enlarge: Pythia PPO-only experiments for 70M, 160M, 410M and 1B variants, including failure cases.">
+        <img src="images/mini-gpt/results-pythia-small-mdl.png" alt="Pythia PPO-only experiments for 70M, 160M, 410M and 1B variants, including failure cases." width="2324" height="1238" loading="lazy" decoding="async">
+        <span class="mg-enlarge" aria-hidden="true">Enlarge figure <span>+</span></span>
+      </a><figcaption>PPO-only experiments: reward behaviour and memory constraints for smaller Pythia variants.</figcaption></figure><figure class="mg-figure ">
+      <a class="mg-figure-link" href="images/mini-gpt/results-pythia-large-mdl.png" data-enlarge aria-label="Enlarge: Pythia LoRA plus PPO results with and without a reference model, including reward and memory use.">
+        <img src="images/mini-gpt/results-pythia-large-mdl.png" alt="Pythia LoRA plus PPO results with and without a reference model, including reward and memory use." width="2386" height="1382" loading="lazy" decoding="async">
+        <span class="mg-enlarge" aria-hidden="true">Enlarge figure <span>+</span></span>
+      </a><figcaption>LoRA + PPO experiments: configurations with and without a reference model. The 2.8B run was halted.</figcaption></figure>
+        </div></details>
+      </div>
+      <div id="panel-qa" class="mg-panel" role="tabpanel" aria-labelledby="tab-qa" tabindex="0">
+        <div class="mg-result-heading"><div><span class="mg-overline">Stack Overflow · LLaMA / Vicuna</span><h3>Task adaptation helped. Reward design remained difficult.</h3></div></div>
+        <p>Our fine-tuned Vicuna-SE model showed a modest improvement over the original Vicuna and stronger results than the Pythia baseline in the project evaluation. GPT-3.5 remained the stronger comparison model.</p>
+        <div class="mg-insight"><strong>Where this track stopped</strong><p>The Q&amp;A work reached reward-model exploration; it did not complete the PPO stage. A programming answer needs to be correct and useful, which is harder to reward than positive sentiment alone.</p></div>
+        <figure class="mg-figure ">
+      <a class="mg-figure-link" href="images/mini-gpt/results-stackoverflow.png" data-enlarge aria-label="Enlarge: Original Stack Overflow question-answering comparison of fine-tuned Vicuna-SE against GPT-3.5, Vicuna-7B and Pythia-6.9B.">
+        <img src="images/mini-gpt/results-stackoverflow.png" alt="Original Stack Overflow question-answering comparison of fine-tuned Vicuna-SE against GPT-3.5, Vicuna-7B and Pythia-6.9B." width="2340" height="1184" loading="lazy" decoding="async">
+        <span class="mg-enlarge" aria-hidden="true">Enlarge figure <span>+</span></span>
+      </a><figcaption>Original Stack Overflow Q&amp;A evaluation slide.</figcaption></figure>
+        <p class="mg-result-note">The original slide reports a proof-of-concept comparison using GPT-4 as an evaluator. It is a project-specific result, not a general coding benchmark.</p>
+      </div>
+    </div>
+  </section>
 
-	<!-- Wrapper -->
-	<div id="wrapper">
-
-		<!-- Main -->
-		<div id="main">
+  <section id="takeaways">
+    <p class="eyebrow">What I took forward</p>
+    <h2>Training decisions need evidence behind them.</h2>
+    <div class="mg-takeaways">
+      <div><h3>Optimize for a clear objective</h3><p>The movie-review task connected a concrete reward signal to a visible change in output. The next step would be to evaluate fluency and diversity alongside sentiment.</p></div>
+      <div><h3>Design around real constraints</h3><p>Model size, quantization, adapters, and PPO configuration all affected feasibility. The smallest model was not automatically the most useful choice.</p></div>
+      <div><h3>Measure what the application needs</h3><p>The Q&amp;A track exposed the limits of a simple reward. Code execution, correctness checks, and human review would strengthen a future evaluation.</p></div>
+    </div>
+    <div class="mg-closing"><h3>From fine-tuning experiments to enterprise AI.</h3><p>This project developed the foundations for my later work on customer-support models, retrieval systems, and scalable inference at Lenovo.</p><div class="hero-actions"><a class="button primary" href="lenovo-vllm-deploy.html">Explore the Lenovo project</a><a class="button" href="mailto:zhangzhipian1@gmail.com">Get in touch</a></div></div>
+  </section>
+  <nav class="project-next related-links" aria-label="More projects"><a href="index.html">Back to all projects</a><a href="rio-tinto.html">Explore the Rio Tinto project</a></nav>
+</article></div></main>
+<div id="sidebar">
 			<div class="inner">
 
-				<!-- Header -->
-				<header id="header">
-					<a href="rio-tinto.html" class="logo"><strong>Blog Post</strong> by Alex (Zhipian) Zhang</a>
-					<ul class="icons">
-						<li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
-						<li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
-						<li><a href="#" class="icon brands fa-snapchat-ghost"><span class="label">Snapchat</span></a>
-						</li>
-						<li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
-						<li><a href="#" class="icon brands fa-medium-m"><span class="label">Medium</span></a></li>
-					</ul>
-				</header>
-
-				<!-- Content -->
-				<section>
-					<header class="main">
-						<h1>Fine-tuning Large Language Models with RLHF and LoRA: Project Highlights</h1>
-					</header>
-					<span class="image main"><img src="images/mini-gpt/coverpage.png" alt="" /></span>
-					<p>In this blog post, we will walk you through the process of efficiently fine-tuning your own LLM.
-						The project aimed to explore the optimization and fine-tuning of Large Language Models (LLMs)
-						using Reinforcement Learning from Human Feedback (RLHF) and Low-Rank Adapter (LoRA) on IMDB and
-						StackOverflow data sets.</p>
-					<h2>Introduction to the Project</h2>
-					<p>You know when we watch movies and then scroll through reviews on IMDb to see if our sentiments
-						align with others? Or when we are stuck in the middle of a coding challenge and scour Stack
-						Overflow for the answer? Now, imagine having your own language model that can mimic this process
-						– writing movie reviews and answering Stack Overflow questions. That's exactly what our team,
-						GPT-is-all-we-need, is working towards.</p>
-					<p>Our objective is to fine-tune large language models (LLMs) using Reinforcement Learning (RL),
-						specifically for two purposes: generating movie reviews and answering Stack Overflow questions.
-						We chose these topics because we felt training the models on these databases can help generate
-						industry-specific responses and ultimately assist in job hunting. Plus, there's the added
-						benefit of being able to understand and implement Reinforcement Learning with Human Feedback
-						(RLHF). This method allows the integration of human input into the training process, thereby
-						refining its performance and generating responses that are more human-like and accurate.
-						Furthermore, understanding memory optimization techniques like LORA is crucial for efficient
-						deployment and scalability of AI models. As the demand for AI solutions increases, optimizing
-						memory usage is essential to save computational resources and reduce costs.</p>
-					<p>However, the road to fine-tuning LLMs wasn't without its bumps. We faced several challenges. The
-						primary issue was that smaller models suffered from performance inefficiencies. Due to their
-						small size, these models, even with fewer parameters, couldn't generate coherent movie reviews
-						or Stack Overflow answers. So, we decided to focus on larger language models, specifically
-						models with more than 1 billion parameters. But then we hit another wall - extreme memory
-						constraint. For instance, the largest model we trained, GPT-neoX, has 20 billion parameters,
-						which would require a whopping 80GB GPU memory without optimization. But, thanks to memory
-						optimization techniques like Low Rank Adapters, mix-precision training, gradient accumulation
-						and checkpointing, we successfully managed to load the models into our GPU with only 24GB of
-						RAMs.</p>
-					<span class="image main"><img src="images/mini-gpt/challenges.png" alt="" /></span>
-
-					<h2>Fine-tuning Process</h2>
-					<p>The main tasks were divided as follows:</p>
-					<ol>
-						<li>Prepare multiple Large Language Models (Pythia, NeoX-GPT, LLaMA, Vicuna)</li>
-						<li>Apply Parameter-Efficient Fine-Tuning (PEFT) to run efficiently on a machine</li>
-						<li>Fine-tune using RLHF for target tasks (generate movie reviews and answer questions on
-							StackOverflow)</li>
-						<li>Train a usable Mini-GPT and compare the performance with prior fine-tuned models</li>
-					</ol>
-
-
-					<p>We first loaded the pre-trained LLMs in 8-bit precision and added low-rank adapters onto the
-						frozen 8-bit model to make these adapters trainable, significantly reducing the number of
-						trainable weights. Then, we fine-tuned the model for text generation on the IMDb dataset and
-						merged the learned adapter layers into the base model’s weights, enabling the base model to gain
-						the knowledge learned during fine-tuning.</p>
-					<span class="image main"><img src="images/mini-gpt/workflows1.png" alt="" /></span>
-					<p>Here is the WandB logs during the fine-tuning of the NeoX-20b model over IMDB dataset:</p>
-					<span class="image main"><img src="images/mini-gpt/wandb-gptneox-20b-imdb-lora.png" alt="" /></span>
-					<p>Finally, we used a popular deep learning algorithm called PPO to fine-tune the merged language
-						model using RL. We had two copies of the merged language model from the previous step, active
-						and reference, and used a reward model for calculating the rewards, which is the sentiment of
-						the movie reviews. The goal was to optimize the active model to maximize these rewards.</p>
-					<span class="image main"><img src="images/mini-gpt/workflows2.png" alt="" /></span>
-
-					<p>We used different datasets and models for this project. The dataset was a combination of data
-						from IMDb and Stack Overflow. The IMDb dataset comprised 20,000 movie reviews, while the Stack
-						Overflow dataset included programming-related questions and answers. For the movie reviews, we
-						used GPT-NeoX-20B, Pythia (70M, 160M, 410M, 1B, 2.8B, and 12B). For the Stack Overflow dataset,
-						we used the LLaMa model. The LLaMa-7B was particularly impressive despite the memory constraint
-						issues.</p>
-					<span class="image main"><img src="images/mini-gpt/dataset-models.png" alt="" /></span>
-
-					<h2>Results</h2>
-					<p>Now, let's talk results. After fine-tuning, our largest language model, NeoX-GPT with 20B
-						parameters, could generate specific movie reviews with more positive sentiments. Below are some
-						sample inference results:</p>
-
-					<span class="image main"><img src="images/mini-gpt/Inference-PPO-GPT-NeoX-samples.png"
-							alt="" /></span>
-
-					<p>Here is the average and median sentiments over 64 samples (only 25 are shown), and the changes in
-						reward during reinforcement learning. The average and median rewards increased considerably
-						after fine-tuning and PPO. </p>
-					<span class="image main"><img src="images/mini-gpt/results-neox.png" alt="" /></span>
-
-					<p>The Pythia models were a mixed bag - smaller ones like the 70M and 160M couldn't respond to the
-						reward model's signal, stalling the fine-tuning. However, the larger Pythia models with more
-						than 410M parameters were successfully trained with PPO and could generate reviews with
-						significantly higher sentiment scores. </p>
-					<span class="image main"><img src="images/mini-gpt/results-pythia-small-mdl.png" alt="" /></span>
-					<span class="image main"><img src="images/mini-gpt/results-pythia-large-mdl.png" alt="" /></span>
-
-					<p>On the Stack Overflow front, we used the same three-step fine-tuning process but stopped at the
-						second step - training a reward model - because unlike sentiment analysis, scoring question
-						quality from a purely linguistic perspective without additional knowledge was challenging.
-						Nevertheless, we evaluated the performance of several models on this task. Our fine-tuned
-						vicuna-SE model showed slight improvement compared to the original vicuna and was significantly
-						better than the base Pythia model. Even though it didn't outperform GPT3.5, it still displayed
-						remarkable performance considering its smaller size.</p>
-					<span class="image main"><img src="images/mini-gpt/results-stackoverflow.png" alt="" /></span>
-					<h2>Conclusion and Future Work</h2>
-					<p>Through this project, we successfully demonstrated the fine-tuning of Large Language Models using
-						Reinforcement Learning from Human Feedback and Low-Rank Adapter on the IMDB and StackOverflow
-						datasets. The results were encouraging, with significant improvements in model performance
-						post-fine-tuning and PPO.</p>
-					<p>While we made significant strides in optimizing Large Language Models for specific tasks, we are
-						aware that the potential for further improvement and exploration is vast. Due to time
-						constraints, we were unable to execute more hyper-parameter tuning, but we aim to address this
-						in future work. We believe that our findings provide a solid foundation for future research in
-						the field and we hope to explore this exciting area of AI/NLP further.</p>
-					<p>To access our code, trained models, and more detailed analysis, check out our project repository.
-						We hope our work serves as a useful reference for your own experiments and research!</p>
-					<!-- <span class="image main"><img src="images/rio-tinto/survey-types.png" alt="" /></span> -->
-
-
-				</section>
-
-			</div>
-		</div>
-
-		<!-- Sidebar -->
-		<div id="sidebar">
-			<div class="inner">
-
-				<!-- Search -->
 				<section id="search" class="alt">
-					<form method="post" action="#">
-						<input type="text" name="query" id="query" placeholder="Search" />
-					</form>
-				</section>
+					<form id="project-search" role="search"><label for="query" class="search-label">Find a project</label><input type="search" name="query" id="query" placeholder="Search project titles" autocomplete="off" aria-controls="sidebar-projects"><p class="search-count" id="search-count" role="status" aria-live="polite"></p></form></section>
 
-				<!-- Menu -->
 				<nav id="menu">
 					<header class="major">
 						<h2>Menu</h2>
@@ -183,99 +210,58 @@
 					<ul>
 						<li><a href="index.html">Homepage</a></li>
 						<li><a href="certificates.html">Certificates</a></li>
-						<!-- <li><a href="generic.html">Generic</a></li>
-									<li><a href="elements.html">Elements</a></li>
-									<li>
-										<span class="opener">Submenu</span>
-										<ul>
-											<li><a href="#">Lorem Dolor</a></li>
-											<li><a href="#">Ipsum Adipiscing</a></li>
-											<li><a href="#">Tempus Magna</a></li>
-											<li><a href="#">Feugiat Veroeros</a></li>
-										</ul>
-									</li>
-									<li><a href="#">Etiam Dolore</a></li>
-									<li><a href="#">Adipiscing</a></li>
-									<li>
-										<span class="opener">Another Submenu</span>
-										<ul>
-											<li><a href="#">Lorem Dolor</a></li>
-											<li><a href="#">Ipsum Adipiscing</a></li>
-											<li><a href="#">Tempus Magna</a></li>
-											<li><a href="#">Feugiat Veroeros</a></li>
-										</ul>
-									</li>
-									<li><a href="#">Maximus Erat</a></li>
-									<li><a href="#">Sapien Mauris</a></li>
-									<li><a href="#">Amet Lacinia</a></li> -->
-					</ul>
+						</ul>
 				</nav>
 
-				<!-- Section -->
 				<section>
 					<header class="major">
 						<h2>Recent blogs</h2>
 					</header>
-					<div class="mini-posts">
-						<article>
-							<a href="lenovo-vllm-deploy.html" class="image"><img
-									src="images/lenovo/coverpage-simplified.png" alt="" /></a>
+					<div class="mini-posts" id="sidebar-projects">
+						<article data-project-title="Lenovo · E-commerce AI, RAG, vLLM and Kubernetes">
+							<a href="lenovo-vllm-deploy.html" class="image"><img src="images/lenovo/coverpage-simplified.png" alt="Lenovo · E-commerce AI, RAG, vLLM and Kubernetes" loading="lazy"></a>
 							<p>Fine-tuning, multimodal product retrieval, and GPU inference for e-commerce customer support.</p>
 						</article>
-						<article>
-							<a href="rio-tinto.html" class="image"><img
-									src="images/rio-tinto/mining-event-tracker-thumbnails.png" alt="" /></a>
-							<p>Uses AI to analyze online press releases, to track mining-related surveys and their
-								completion timelines, to help Rio Tinto better invest.</p>
+						<article data-project-title="Rio Tinto · Mining intelligence and NLP">
+							<a href="rio-tinto.html" class="image"><img src="images/rio-tinto/mining-event-tracker-thumbnails.png" alt="Rio Tinto · Mining intelligence and NLP" loading="lazy"></a>
+							<p>Extracting mining-project information from online news to support business intelligence.</p>
 						</article>
-						<article>
-							<a href="mini-gpt.html" class="image"><img src="images/mini-gpt/coverpage.png" alt="" /></a>
-							<p>Train your own large language models (LLMs) to generate industry-specific responses,
-								using reinforcement learning and memory optimization techniques.</p>
+						<article data-project-title="Mini-GPT · LLM fine-tuning with LoRA and RLHF">
+							<a href="mini-gpt.html" class="image"><img src="images/mini-gpt/coverpage.png" alt="Mini-GPT · LLM fine-tuning with LoRA and RLHF" loading="lazy"></a>
+							<p>Exploring language-model fine-tuning, reinforcement learning, and memory-efficient training.</p>
 						</article>
-						<article>
-							<a href="msnews-ar.html" class="image"><img src="images/msnews-ar/overview.jpg"
-									alt="" /></a>
-							<p>Winning Project of nwHacks - classifying images using AI, discovering related digital
-								contents, and rendering them in AR.</p>
+						<article data-project-title="MSNewsAR · AI and augmented reality">
+							<a href="msnews-ar.html" class="image"><img src="images/msnews-ar/overview.jpg" alt="MSNewsAR · AI and augmented reality" loading="lazy"></a>
+							<p>Microsoft Azure prize-winning project combining image analysis, content discovery, and augmented reality.</p>
 						</article>
 					</div>
 					<ul class="actions">
-						<li><a href="#" class="button">More</a></li>
+						<li><a href="index.html" class="button">More</a></li>
 					</ul>
 				</section>
 
-				<!-- Section -->
 				<section>
 					<header class="major">
 						<h2>Get in touch</h2>
 					</header>
 					<p>If you are interested in learning more about my work, feel free to get in touch.</p>
 					<ul class="contact">
-						<li class="icon solid fa-envelope"><a href="#">zhangzhipian1@gmail.com</a></li>
-						<!-- <li class="icon solid fa-phone"></li> -->
-						<!-- <li class="icon solid fa-home">1234 Somewhere Road #8254<br />
-									Nashville, TN 00000-0000</li> -->
-					</ul>
+						<li class="icon solid fa-envelope"><a href="mailto:zhangzhipian1@gmail.com">zhangzhipian1@gmail.com</a></li>
+						</ul>
 				</section>
 
-				<!-- Footer -->
 				<footer id="footer">
-					<p class="copyright">&copy; Alex (Zhipian) Zhang. All rights reserved.</p>
+					<p class="copyright">© Alex (Zhipian) Zhang. All rights reserved.<span><br>Design: <a href="https://html5up.net">HTML5 UP</a></span></p>
 				</footer>
 
 			</div>
 		</div>
 
-	</div>
-
-	<!-- Scripts -->
-	<script src="assets/js/jquery.min.js"></script>
-	<script src="assets/js/browser.min.js"></script>
-	<script src="assets/js/breakpoints.min.js"></script>
-	<script src="assets/js/util.js"></script>
-	<script src="assets/js/main.js"></script>
-
-</body>
-
-</html>
+</div>
+<dialog class="mg-lightbox" id="mg-lightbox" aria-labelledby="mg-lightbox-title">
+  <div class="mg-lightbox-bar"><h2 id="mg-lightbox-title">Project figure</h2><button type="button" class="mg-close" aria-label="Close enlarged figure">Close <span aria-hidden="true">×</span></button></div>
+  <div class="mg-lightbox-content"><img id="mg-lightbox-image" alt=""><p id="mg-lightbox-caption"></p></div>
+</dialog>
+<script src="assets/js/jquery.min.js"></script><script src="assets/js/browser.min.js"></script><script src="assets/js/breakpoints.min.js"></script><script src="assets/js/util.js"></script><script src="assets/js/main.js"></script>
+<script src="assets/js/project-pages.js?v=20261116-evidence"></script><script src="assets/js/mini-gpt.js?v=20261122"></script>
+</body></html>
